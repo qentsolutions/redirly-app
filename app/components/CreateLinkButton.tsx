@@ -15,7 +15,7 @@ import { Modal } from './ui/Modal'
 interface CreateLinkButtonProps {
     organizationSlug: string
     variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
-    size?: 'sm' | 'lg' | 'icon'
+    size?: 'default' | 'sm' | 'lg' | 'icon'
     fullWidth?: boolean
 }
 
