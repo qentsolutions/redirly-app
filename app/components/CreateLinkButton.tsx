@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from './ui/Button'
+import { Button } from '@/components/ui/button'
 import { Input } from './ui/Input'
 import { Modal } from './ui/Modal'
 
@@ -14,15 +14,15 @@ import { Modal } from './ui/Modal'
 
 interface CreateLinkButtonProps {
     organizationSlug: string
-    variant?: 'primary' | 'secondary'
-    size?: 'sm' | 'md' | 'lg'
+    variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+    size?: 'sm' | 'lg' | 'icon'
     fullWidth?: boolean
 }
 
 export function CreateLinkButton({
     organizationSlug,
-    variant = 'primary',
-    size = 'md',
+    variant = 'default',
+    size = 'default',
     fullWidth = false,
 }: CreateLinkButtonProps) {
     const router = useRouter()

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { getCurrentUser } from '@/lib/session'
 import { Navbar } from '../components/layout/navbar'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
-import { Button } from '../components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { db } from '@/lib/prisma'
 
 

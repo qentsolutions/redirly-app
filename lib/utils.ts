@@ -2,6 +2,9 @@
  * Fonctions utilitaires générales
  */
 
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
 /**
  * Copie du texte dans le presse-papiers
  */
@@ -183,11 +186,10 @@ export function slugify(text: string): string {
 
 /**
  * Classe conditionnelle (utile pour Tailwind)
+ * Utilise clsx pour gérer les conditions et tailwind-merge pour fusionner intelligemment les classes Tailwind
  */
-export function cn(
-  ...classes: (string | boolean | undefined | null)[]
-): string {
-  return classes.filter(Boolean).join(" ");
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
 
 /**

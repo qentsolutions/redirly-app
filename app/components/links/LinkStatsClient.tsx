@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
-import { Button } from '../ui/Button'
+import { Button } from '@/components/ui/button'
 import { ClicksChart } from '../ClicksChart'
 import { StatsBreakdown } from '../StatsBreakdown'
 
@@ -105,36 +105,24 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                         </div>
                         {/* Toggles de période */}
                         <div className="flex gap-2">
-                            <button
+                            <Button
                                 onClick={() => setPeriod('1')}
-                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                                    period === '1'
-                                        ? 'bg-primary-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                                variant={period === '1' ? 'default' : 'secondary'}
                             >
                                 24 heures
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={() => setPeriod('7')}
-                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                                    period === '7'
-                                        ? 'bg-primary-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                                variant={period === '7' ? 'default' : 'secondary'}
                             >
                                 7 jours
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={() => setPeriod('30')}
-                                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                                    period === '30'
-                                        ? 'bg-primary-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                                variant={period === '30' ? 'default' : 'secondary'}
                             >
                                 30 jours
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </CardHeader>

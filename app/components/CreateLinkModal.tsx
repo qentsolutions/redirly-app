@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Modal } from './ui/Modal'
 import { Input } from './ui/Input'
-import { Button } from './ui/Button'
+import { Button } from '@/components/ui/button'
 
 
 interface CreateLinkModalProps {

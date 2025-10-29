@@ -8,7 +8,7 @@ import { DeleteLinkModal } from './DeleteLinkModal'
 import { buildShortUrl } from '@/lib/links'
 import { formatDate, formatNumber } from '../../lib/utils'
 import { CopyButton } from './CopyButton'
-import { Button } from './ui/Button'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from './ui/Card'
 
 /**

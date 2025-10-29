@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card'
+import { ArrowLeft, Building2 } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 import { Input } from '@/app/components/ui/Input'
-import { Button } from '@/app/components/ui/Button'
 
 
 export default function NewOrganizationPage() {
@@ -52,26 +54,40 @@ export default function NewOrganizationPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4">
+        <div className="min-h-screen bg-background py-12 px-4">
             <div className="max-w-2xl mx-auto">
                 <div className="mb-8">
-                    <Link href="/dashboard" className="text-sm text-primary-600 hover:text-primary-700 mb-2 inline-block">
-                        ← Retour au dashboard
-                    </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Créer une nouvelle organisation</h1>
-                    <p className="text-gray-600 mt-2">
+                    <Button variant="ghost" size="sm" asChild className="mb-4 -ml-2">
+                        <Link href="/dashboard">
+                            <ArrowLeft className="h-4 w-4" />
+                            Retour au dashboard
+                        </Link>
+                    </Button>
+
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="rounded-lg bg-primary/10 p-2">
+                            <Building2 className="h-6 w-6" />
+                        </div>
+                        <h1 className="text-3xl font-bold tracking-tight">Créer une nouvelle organisation</h1>
+                    </div>
+                    <p className="text-muted-foreground text-lg">
                         Une organisation vous permet de regrouper et gérer vos liens trackés
                     </p>
                 </div>
 
+                <Separator className="mb-8" />
+
                 <Card>
                     <CardHeader>
                         <CardTitle>Informations de l'organisation</CardTitle>
+                        <CardDescription>
+                            Renseignez les détails de votre nouvelle organisation
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                             {errors.general && (
-                                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                                <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
                                     {errors.general}
                                 </div>
                             )}
@@ -87,27 +103,29 @@ export default function NewOrganizationPage() {
                             />
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium mb-2">
                                     Description (optionnel)
                                 </label>
                                 <textarea
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    className="w-full px-3 py-2 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
                                     placeholder="Décrivez brièvement votre organisation..."
                                     rows={4}
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 />
                                 {errors.description?.[0] && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.description[0]}</p>
+                                    <p className="mt-2 text-sm text-destructive">{errors.description[0]}</p>
                                 )}
                             </div>
 
-                            <div className="flex items-center justify-end gap-3 pt-4">
-                                <Link href="/dashboard">
-                                    <Button type="button" variant="ghost">
+                            <Separator />
+
+                            <div className="flex items-center justify-end gap-3">
+                                <Button type="button" variant="outline" asChild>
+                                    <Link href="/dashboard">
                                         Annuler
-                                    </Button>
-                                </Link>
+                                    </Link>
+                                </Button>
                                 <Button type="submit" loading={loading}>
                                     Créer l'organisation
                                 </Button>

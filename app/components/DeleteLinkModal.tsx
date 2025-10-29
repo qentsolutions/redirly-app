@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from './ui/Button'
+import { Button } from '@/components/ui/button'
 import { Modal } from './ui/Modal'
 
 
@@ -99,7 +99,7 @@ export function DeleteLinkModal({ link }: DeleteLinkModalProps) {
                         <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
                             Annuler
                         </Button>
-                        <Button variant="danger" onClick={handleDelete} loading={loading}>
+                        <Button variant="destructive" onClick={handleDelete} loading={loading}>
                             Supprimer définitivement
                         </Button>
                     </div>

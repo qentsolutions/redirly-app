@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { copyToClipboard } from '@/lib/utils'
-import { Button } from './ui/Button'
+import { Button } from '@/components/ui/button'
 
 /**
  * Composant bouton pour copier du texte dans le presse-papiers
@@ -12,8 +12,8 @@ interface CopyButtonProps {
     text: string
     label?: string
     successMessage?: string
-    variant?: 'primary' | 'secondary' | 'ghost'
-    size?: 'sm' | 'md' | 'lg'
+    variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+    size?: 'sm' | 'lg' | 'icon' | 'default'
 }
 
 export function CopyButton({

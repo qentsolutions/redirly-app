@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
-import { Button } from '../components/ui/Button'
+import { Button } from '@/components/ui/button'
 
 export default function SignupPage() {
     const router = useRouter()

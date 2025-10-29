@@ -1,13 +1,15 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Link2, CheckCircle2, Eye, ArrowLeft, Plus, ExternalLink } from 'lucide-react'
 import { getCurrentUser } from '@/lib/session'
 import { db } from '@/lib/prisma'
 import { buildShortUrl } from '@/lib/links'
 import { Navbar } from '@/app/components/layout/navbar'
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card'
-import { CreateLinkModal } from '@/app/components/links/CreateLinkModal'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/Table'
-import { Button } from '@/app/components/ui/Button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { StatsCard } from '@/components/ui/stats-card'
 import { LinkCard } from '@/app/components/LinkCard'
 import { CreateLinkButton } from '@/app/components/CreateLinkButton'
 
@@ -63,99 +65,87 @@ export default async function OrganizationPage({ params }: PageProps) {
     const activeLinks = links.filter(link => link.isActive).length
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background">
             <Navbar user={user} />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* En-tête */}
                 <div className="mb-8">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <Link href="/dashboard" className="text-sm text-primary-600 hover:text-primary-700 mb-2 inline-block">
-                                ← Retour au dashboard
-                            </Link>
-                            <h1 className="text-3xl font-bold text-gray-900">{organization.name}</h1>
+                    <Button variant="ghost" size="sm" asChild className="mb-4 -ml-2">
+                        <Link href="/dashboard">
+                            <ArrowLeft className="h-4 w-4" />
+                            Retour au dashboard
+                        </Link>
+                    </Button>
+
+                    <div className="flex items-start justify-between">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                                <h1 className="text-4xl font-bold tracking-tight">{organization.name}</h1>
+                                <Badge variant="secondary" className="text-xs">
+                                    {slug}
+                                </Badge>
+                            </div>
                             {organization.description && (
-                                <p className="text-gray-600 mt-2">{organization.description}</p>
+                                <p className="text-muted-foreground text-lg max-w-2xl">
+                                    {organization.description}
+                                </p>
                             )}
                         </div>
                         <CreateLinkButton organizationSlug={slug} size="lg" />
                     </div>
                 </div>
 
+                <Separator className="mb-8" />
+
                 {/* Statistiques */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <Card>
-                        <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-600">Total de liens</p>
-                                    <p className="text-3xl font-bold text-gray-900 mt-1">{links.length}</p>
-                                </div>
-                                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-600">Liens actifs</p>
-                                    <p className="text-3xl font-bold text-gray-900 mt-1">{activeLinks}</p>
-                                </div>
-                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardContent>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm text-gray-600">Total de clics</p>
-                                    <p className="text-3xl font-bold text-gray-900 mt-1">{totalClicks.toLocaleString()}</p>
-                                </div>
-                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <StatsCard
+                        title="Total de liens"
+                        value={links.length}
+                        icon={<Link2 className="h-5 w-5 text-muted-foreground" />}
+                    />
+                    <StatsCard
+                        title="Liens actifs"
+                        value={activeLinks}
+                        icon={<CheckCircle2 className="h-5 w-5 text-green-600" />}
+                    />
+                    <StatsCard
+                        title="Total de clics"
+                        value={totalClicks.toLocaleString()}
+                        icon={<Eye className="h-5 w-5 text-blue-600" />}
+                    />
                 </div>
 
                 {/* Liste des liens */}
                 {links.length === 0 ? (
-                    <Card>
-                        <CardContent>
-                            <div className="text-center py-12">
-                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                    </svg>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Aucun lien créé</h3>
-                                <p className="text-gray-500 mb-6">Commencez par créer votre premier lien court</p>
-                                <CreateLinkButton organizationSlug={slug} />
+                    <Card className="border-dashed">
+                        <CardContent className="flex flex-col items-center justify-center py-16">
+                            <div className="rounded-full bg-muted p-4 mb-4">
+                                <Link2 className="h-8 w-8 text-muted-foreground" />
                             </div>
+                            <CardTitle className="mb-2">Aucun lien créé</CardTitle>
+                            <CardDescription className="text-center mb-6 max-w-sm">
+                                Commencez par créer votre premier lien court pour suivre vos statistiques et gérer vos redirections.
+                            </CardDescription>
+                            <CreateLinkButton organizationSlug={slug} />
                         </CardContent>
                     </Card>
                 ) : (
-                    <div className="space-y-4">
-                        {links.map((link) => (
-                            <LinkCard key={link.id} link={link} />
-                        ))}
+                    <div className="space-y-1">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 className="text-2xl font-semibold tracking-tight">Liens</h2>
+                                <p className="text-muted-foreground">
+                                    Gérez vos liens courts et suivez leurs performances
+                                </p>
+                            </div>
+                        </div>
+                        <div className="space-y-3">
+                            {links.map((link) => (
+                                <LinkCard key={link.id} link={link} />
+                            ))}
+                        </div>
                     </div>
                 )}
             </main>
