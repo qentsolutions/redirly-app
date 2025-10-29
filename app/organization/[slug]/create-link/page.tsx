@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Input } from '@/app/components/ui/Input'
@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Ca
  * Accessible via /organization/[slug]/create-link
  */
 
-export default function CreateLinkPage() {
+function CreateLinkForm() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const organizationSlug = searchParams.get('org')
@@ -246,5 +246,29 @@ export default function CreateLinkPage() {
                 </Card>
             </div>
         </div>
+    )
+}
+
+export default function CreateLinkPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 py-12">
+                <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="animate-pulse">
+                        <div className="h-6 bg-gray-200 rounded w-48 mb-6"></div>
+                        <div className="bg-white rounded-lg shadow p-8">
+                            <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
+                            <div className="space-y-4">
+                                <div className="h-12 bg-gray-200 rounded"></div>
+                                <div className="h-12 bg-gray-200 rounded"></div>
+                                <div className="h-12 bg-gray-200 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }>
+            <CreateLinkForm />
+        </Suspense>
     )
 }
