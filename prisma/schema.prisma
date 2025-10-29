@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+// Modèle utilisateur avec authentification
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  password      String   // Hash bcrypt du mot de passe
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  sessions                Session[]
+  ownedOrganizations      Organization[]
+  organizationMemberships OrganizationMember[]
+
+  @@map("users")
+}
+
+// Sessions utilisateur pour BetterAuth
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Modèle organisation
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique // Slug unique pour URLs personnalisées
+  description String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  owner   User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members OrganizationMember[]
+  links   Link[]
+
+  @@index([slug])
+  @@index([ownerId])
+  @@map("organizations")
+}
+
+// Table de liaison pour membres d'organisations (multi-tenancy)
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  role           String   @default("member") // "owner", "admin", "member"
+  joinedAt       DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
+  @@map("organization_members")
+}
+
+// Modèle lien tracké
+model Link {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String   // Label/nom du lien
+  originalUrl    String   // URL de destination
+  shortCode      String   @unique // Code court pour le lien (ex: abc123)
+  customDomain   String?  // Domaine personnalisé optionnel
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  clicks       Click[]
+
+  @@index([shortCode])
+  @@index([organizationId])
+  @@map("links")
+}
+
+// Modèle pour analytics des clics (anonymisé RGPD)
+model Click {
+  id         String   @id @default(cuid())
+  linkId     String
+  timestamp  DateTime @default(now())
+  
+  // Données anonymisées pour analytics
+  ipHash     String?  // Hash SHA256 de l'IP (pas l'IP brute)
+  country    String?  // Code pays (ex: FR, US)
+  city       String?  // Ville approximative
+  device     String?  // Type d'appareil (mobile, desktop, tablet)
+  browser    String?  // Navigateur (Chrome, Firefox, Safari, etc.)
+  os         String?  // Système d'exploitation (Windows, macOS, Linux, iOS, Android)
+  referer    String?  // Source du trafic
+
+  // Relations
+  link Link @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@index([linkId])
+  @@index([timestamp])
+  @@map("clicks")
+}
