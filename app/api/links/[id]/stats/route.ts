@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/session";
 import { db } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 /**
  * GET /api/links/[id]/stats
@@ -19,9 +20,12 @@ export async function GET(
 
     const { id } = await params;
 
-    // Récupère le paramètre de période (par défaut: 30)
+    // Récupère les paramètres
     const { searchParams } = new URL(request.url);
     const period = searchParams.get("period") || "30";
+    const granularity = searchParams.get("granularity") || "daily";
+    const customStartDate = searchParams.get("startDate");
+    const customEndDate = searchParams.get("endDate");
 
     // Vérifie les permissions
     const link = await db.link.findUnique({
@@ -47,18 +51,41 @@ export async function GET(
     }
 
     // Calcule la date de début selon la période
-    const startDate = new Date();
-    switch (period) {
-      case "1": // 24 heures
-        startDate.setHours(startDate.getHours() - 24);
-        break;
-      case "7": // 7 jours
-        startDate.setDate(startDate.getDate() - 7);
-        break;
-      case "30": // 30 jours
-      default:
-        startDate.setDate(startDate.getDate() - 30);
-        break;
+    let startDate = new Date();
+    let endDate = new Date();
+
+    if (customStartDate && customEndDate) {
+      // Dates personnalisées
+      startDate = new Date(customStartDate);
+      endDate = new Date(customEndDate);
+
+      if (period === "1" && customStartDate === customEndDate) {
+        // Vue horaire pour une seule date
+        startDate.setHours(0, 0, 0, 0); // Début du jour
+        endDate.setHours(23, 59, 59, 999); // Fin du jour
+      } else {
+        // Plage de dates
+        endDate.setHours(23, 59, 59, 999); // Fin de la journée
+      }
+    } else {
+      // Périodes prédéfinies
+      switch (period) {
+        case "1": // Aujourd'hui (00:00 à 23:59)
+          if (granularity === "hourly") {
+            startDate.setHours(0, 0, 0, 0); // Début de la journée
+            endDate.setHours(23, 59, 59, 999); // Fin de la journée
+          } else {
+            startDate.setHours(startDate.getHours() - 24);
+          }
+          break;
+        case "7": // 7 jours
+          startDate.setDate(startDate.getDate() - 7);
+          break;
+        case "30": // 30 jours
+        default:
+          startDate.setDate(startDate.getDate() - 30);
+          break;
+      }
     }
 
     // Statistiques globales
@@ -71,37 +98,88 @@ export async function GET(
         linkId: id,
         timestamp: {
           gte: startDate,
+          ...(customStartDate && customEndDate ? { lte: endDate } : {}),
         },
       },
     });
 
-    // Clics par jour/heure selon la période
+    // Clics par jour/heure/semaine selon la granularité
     let clicksByDay: Array<{ date: string; count: bigint }>;
 
-    if (period === "1") {
-      // Pour 24 heures, grouper par heure
-      clicksByDay = await db.$queryRaw<Array<{ date: string; count: bigint }>>`
+    if (granularity === "hourly") {
+      // Pour la vue horaire, grouper par heure
+      const rawClicks = await db.$queryRaw<Array<{ date: string; count: bigint }>>`
         SELECT
-          TO_CHAR(DATE_TRUNC('hour', timestamp), 'YYYY-MM-DD HH24:00') as date,
+          TO_CHAR(DATE_TRUNC('hour', timestamp), 'YYYY-MM-DD HH24:MI') as date,
           COUNT(*) as count
         FROM clicks
         WHERE "linkId" = ${id}
           AND timestamp >= ${startDate}
+          ${customStartDate && customEndDate ? Prisma.sql`AND timestamp <= ${endDate}` : Prisma.empty}
         GROUP BY DATE_TRUNC('hour', timestamp)
         ORDER BY DATE_TRUNC('hour', timestamp) ASC
       `;
-    } else {
-      // Pour 7 et 30 jours, grouper par jour
+
+      // Remplir toutes les heures manquantes avec 0
+      const clicksMap = new Map(rawClicks.map(c => [c.date, c.count]));
+      clicksByDay = [];
+
+      const current = new Date(startDate);
+      current.setMinutes(0, 0, 0);
+      const end = new Date(endDate);
+
+      while (current <= end) {
+        const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')} ${String(current.getHours()).padStart(2, '0')}:00`;
+        clicksByDay.push({
+          date: dateStr,
+          count: clicksMap.get(dateStr) || BigInt(0)
+        });
+        current.setHours(current.getHours() + 1);
+      }
+    } else if (granularity === "weekly") {
+      // Pour la vue hebdomadaire, grouper par semaine
       clicksByDay = await db.$queryRaw<Array<{ date: string; count: bigint }>>`
+        SELECT
+          TO_CHAR(DATE_TRUNC('week', timestamp), 'YYYY-MM-DD') as date,
+          COUNT(*) as count
+        FROM clicks
+        WHERE "linkId" = ${id}
+          AND timestamp >= ${startDate}
+          ${customStartDate && customEndDate ? Prisma.sql`AND timestamp <= ${endDate}` : Prisma.empty}
+        GROUP BY DATE_TRUNC('week', timestamp)
+        ORDER BY DATE_TRUNC('week', timestamp) ASC
+      `;
+    } else {
+      // Pour la vue journalière (par défaut), grouper par jour
+      const rawClicks = await db.$queryRaw<Array<{ date: string; count: bigint }>>`
         SELECT
           DATE(timestamp) as date,
           COUNT(*) as count
         FROM clicks
         WHERE "linkId" = ${id}
           AND timestamp >= ${startDate}
+          ${customStartDate && customEndDate ? Prisma.sql`AND timestamp <= ${endDate}` : Prisma.empty}
         GROUP BY DATE(timestamp)
         ORDER BY date ASC
       `;
+
+      // Remplir tous les jours manquants avec 0
+      const clicksMap = new Map(rawClicks.map(c => [c.date, c.count]));
+      clicksByDay = [];
+
+      const current = new Date(startDate);
+      current.setHours(0, 0, 0, 0);
+      const end = new Date(endDate);
+      end.setHours(0, 0, 0, 0);
+
+      while (current <= end) {
+        const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
+        clicksByDay.push({
+          date: dateStr,
+          count: clicksMap.get(dateStr) || BigInt(0)
+        });
+        current.setDate(current.getDate() + 1);
+      }
     }
 
     // Clics par pays
