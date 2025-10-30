@@ -157,14 +157,14 @@ export async function GET(
       // Pour la vue journalière (par défaut), grouper par jour
       const rawClicks = await db.$queryRaw<Array<{ date: string; count: bigint }>>`
         SELECT
-          DATE(timestamp) as date,
+          TO_CHAR(DATE_TRUNC('day', timestamp), 'YYYY-MM-DD') as date,
           COUNT(*) as count
         FROM clicks
         WHERE "linkId" = ${id}
           AND timestamp >= ${startDate}
           ${customStartDate && customEndDate ? Prisma.sql`AND timestamp <= ${endDate}` : Prisma.empty}
-        GROUP BY DATE(timestamp)
-        ORDER BY date ASC
+        GROUP BY DATE_TRUNC('day', timestamp)
+        ORDER BY DATE_TRUNC('day', timestamp) ASC
       `;
 
       // Remplir tous les jours manquants avec 0

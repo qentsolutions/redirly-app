@@ -66,9 +66,10 @@ export default async function LinkStatsPage({ params }: PageProps) {
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span>Short link: <code className="bg-gray-100 px-2 py-1 rounded">{shortUrl}</code></span>
                         <span
-                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${link.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                            className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-full ${link.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                                 }`}
                         >
+                            <span className={`w-2 h-2 rounded-full ${link.isActive ? 'bg-green-600' : 'bg-red-600'}`}></span>
                             {link.isActive ? 'Active' : 'Inactive'}
                         </span>
                     </div>

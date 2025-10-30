@@ -79,11 +79,12 @@ export function LinkCard({ link }: LinkCardProps) {
                         <div className="flex items-center gap-3 mb-2">
                             <h3 className="text-lg font-semibold text-gray-900">{link.name}</h3>
                             <span
-                                className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${link.isActive
+                                className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-full ${link.isActive
                                     ? 'bg-green-100 text-green-800'
                                     : 'bg-gray-100 text-gray-800'
                                     }`}
                             >
+                                <span className={`w-2 h-2 rounded-full ${link.isActive ? 'bg-green-600' : 'bg-red-600'}`}></span>
                                 {link.isActive ? 'Active' : 'Inactive'}
                             </span>
                         </div>

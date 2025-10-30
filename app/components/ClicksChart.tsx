@@ -76,7 +76,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
 
         // Show point if it's different from previous or next value
         return (prevValue !== null && currentValue !== prevValue) ||
-               (nextValue !== null && currentValue !== nextValue)
+            (nextValue !== null && currentValue !== nextValue)
     }
 
     return (
@@ -185,7 +185,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                                         x2={xScale(point.date)}
                                         y2={100}
                                         stroke="currentColor"
-                                        strokeWidth={1}
+                                        strokeWidth={2}
                                         className="opacity-0 group-hover/tooltip:opacity-100 text-zinc-300  transition-opacity"
                                         vectorEffect="non-scaling-stroke"
                                         style={{ pointerEvents: 'none' }}
@@ -212,14 +212,15 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                             </TooltipTrigger>
                             <TooltipContent>
                                 <div className="font-medium">
+                                    {point.value} {point.value <= 1 ? 'click' : 'clicks'}
+                                </div>
+                                <div className="text-gray-500 text-sm">
                                     {granularity === 'hourly'
                                         ? point.date.toLocaleString('en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
                                         : granularity === 'weekly'
-                                        ? `Week ${getWeekNumber(point.date)} - ${point.date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}`
-                                        : formatDate(point.date)
-                                    }
-                                </div>
-                                <div className="text-gray-500 text-sm">{point.value} clicks</div>
+                                            ? `Week ${getWeekNumber(point.date)} - ${point.date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}`
+                                            : formatDate(point.date)
+                                    }</div>
                             </TooltipContent>
                         </ClientTooltip>
                     ))}

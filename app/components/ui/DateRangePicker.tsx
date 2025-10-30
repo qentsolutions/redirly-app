@@ -36,10 +36,10 @@ export function DateRangePicker({ onDateRangeChange, periodLabel }: DateRangePic
     }
     const start = new Date(dateRange.start.year, dateRange.start.month - 1, dateRange.start.day)
     if (!dateRange?.end || (dateRange.start.compare(dateRange.end) === 0)) {
-      return start.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+      return start.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
     }
     const end = new Date(dateRange.end.year, dateRange.end.month - 1, dateRange.end.day)
-    return `${start.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} - ${end.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}`
+    return `${start.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })} - ${end.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}`
   }
 
   return (
@@ -47,7 +47,7 @@ export function DateRangePicker({ onDateRangeChange, periodLabel }: DateRangePic
       <Button
         variant="secondary"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 border-gray-200 border"
+        className="flex items-center gap-2 bg-white shadow-none border-gray-200 border"
       >
         <CalendarIcon size={16} />
         {formatDateRange()}

@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button'
 import { ClicksChart } from '../ClicksChart'
 import { StatsBreakdown } from '../StatsBreakdown'
 import { DateRangePicker } from '../ui/DateRangePicker'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 
 interface LinkStatsClientProps {
     linkId: string
@@ -168,24 +175,32 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
                             <CardTitle>Clicks Over Time</CardTitle>
-                            <Button size="sm" variant="ghost" onClick={fetchQRCode}>
+                            <div className="flex flex-wrap gap-2 items-center">
+                                <DateRangePicker onDateRangeChange={handleDateRangeChange} periodLabel={getPeriodLabel()} />
+                                <Select value={granularity} onValueChange={(value) => setGranularity(value as Granularity)}>
+                                    <SelectTrigger className="w-[130px]">
+                                        <SelectValue placeholder="Select granularity" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="hourly" disabled={!availableGranularities.includes('hourly')}>
+                                            Hourly
+                                        </SelectItem>
+                                        <SelectItem value="daily" disabled={!availableGranularities.includes('daily')}>
+                                            Daily
+                                        </SelectItem>
+                                        <SelectItem value="weekly" disabled={!availableGranularities.includes('weekly')}>
+                                            Weekly
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            {/* <Button size="sm" variant="ghost" onClick={fetchQRCode}>
                                 <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                                 </svg>
                                 Generate QR Code
                             </Button>
-                        </div>
-                        <div className="flex flex-wrap gap-2 items-center">
-                            <DateRangePicker onDateRangeChange={handleDateRangeChange} periodLabel={getPeriodLabel()} />
-                            <select
-                                value={granularity}
-                                onChange={(e) => setGranularity(e.target.value as Granularity)}
-                                className="px-3 py-2 text-sm shadow-sm border border-gray-200  rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="hourly" disabled={!availableGranularities.includes('hourly')}>Hourly</option>
-                                <option value="daily" disabled={!availableGranularities.includes('daily')}>Daily</option>
-                                <option value="weekly" disabled={!availableGranularities.includes('weekly')}>Weekly</option>
-                            </select>
+                            */}
                         </div>
                     </div>
                 </CardHeader>
