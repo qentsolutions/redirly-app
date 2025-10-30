@@ -66,6 +66,19 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
         return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
     }
 
+    // Function to check if a point has variations (different from previous or next point)
+    const hasVariationAtIndex = (index: number): boolean => {
+        if (data.length <= 1) return false
+
+        const currentValue = data[index].value
+        const prevValue = index > 0 ? data[index - 1].value : null
+        const nextValue = index < data.length - 1 ? data[index + 1].value : null
+
+        // Show point if it's different from previous or next value
+        return (prevValue !== null && currentValue !== prevValue) ||
+               (nextValue !== null && currentValue !== nextValue)
+    }
+
     return (
         <div
             className="relative h-72 w-full"
@@ -89,6 +102,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
             >
                 {yScale
                     .ticks(8)
+                    .filter((value) => Number.isInteger(value))
                     .map((value) => (
                         <div
                             key={value}
@@ -121,6 +135,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                     {/* Grid lines */}
                     {yScale
                         .ticks(8)
+                        .filter((value) => Number.isInteger(value))
                         .map((value, i) => (
                             <g
                                 key={i}
@@ -142,7 +157,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                         d={d}
                         fill="none"
                         className="stroke-blue-500"
-                        strokeWidth="2"
+                        strokeWidth="3"
                         vectorEffect="non-scaling-stroke"
                     />
 
@@ -150,16 +165,18 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                     {data.map((point, index) => (
                         <ClientTooltip key={index}>
                             <TooltipTrigger>
-                                <path
-                                    key={`dot-${index}`}
-                                    d={`M ${xScale(point.date)} ${yScale(point.value)} l 0.0001 0`}
-                                    vectorEffect="non-scaling-stroke"
-                                    strokeWidth="7"
-                                    strokeLinecap="round"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    className="text-blue-400"
-                                />
+                                {hasVariationAtIndex(index) && (
+                                    <path
+                                        key={`dot-${index}`}
+                                        d={`M ${xScale(point.date)} ${yScale(point.value)} l 0.0001 0`}
+                                        vectorEffect="non-scaling-stroke"
+                                        strokeWidth="7"
+                                        strokeLinecap="round"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        className="text-blue-400"
+                                    />
+                                )}
                                 <g className="group/tooltip">
                                     {/* Tooltip Line */}
                                     <line

@@ -128,7 +128,11 @@ export async function GET(
       current.setMinutes(0, 0, 0);
       const end = new Date(endDate);
 
-      while (current <= end) {
+      // Ne pas aller au-delà de l'heure actuelle
+      const now = new Date();
+      const maxDate = end < now ? end : now;
+
+      while (current <= maxDate) {
         const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')} ${String(current.getHours()).padStart(2, '0')}:00`;
         clicksByDay.push({
           date: dateStr,

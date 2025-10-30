@@ -50,7 +50,7 @@ export default async function LinkStatsPage({ params }: PageProps) {
     const shortUrl = buildShortUrl(link.shortCode, link.customDomain)
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
             <Navbar user={user} />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
