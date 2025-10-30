@@ -102,9 +102,11 @@ export async function GET(
     }
 
     // Statistiques globales
-    // allTimeClicks: tous les clics filtrés (sans date range)
+    // allTimeClicks: tous les clics sans filtres (vraiment all time)
     const allTimeClicks = await db.click.count({
-      where: baseFilterConditions,
+      where: {
+        linkId: id,
+      },
     });
 
     // recentClicks: clics filtrés dans la période sélectionnée (avec date range)
@@ -117,6 +119,30 @@ export async function GET(
         },
       },
     });
+
+    // Calculate trend: compare current period with previous period
+    const periodDuration = endDate.getTime() - startDate.getTime();
+    const previousStartDate = new Date(startDate.getTime() - periodDuration);
+    const previousEndDate = new Date(startDate.getTime());
+
+    const previousPeriodClicks = await db.click.count({
+      where: {
+        ...baseFilterConditions,
+        timestamp: {
+          gte: previousStartDate,
+          lt: previousEndDate,
+        },
+      },
+    });
+
+    const clicksTrend = previousPeriodClicks > 0
+      ? {
+          value: Math.round(((recentClicks - previousPeriodClicks) / previousPeriodClicks) * 100),
+          isPositive: recentClicks >= previousPeriodClicks,
+        }
+      : recentClicks > 0
+      ? { value: 100, isPositive: true }
+      : undefined;
 
     // Clics par jour/heure/semaine selon la granularité
     let clicksByDay: Array<{ date: string; count: bigint }>;
@@ -319,6 +345,7 @@ export async function GET(
       stats: {
         allTimeClicks,
         recentClicks,
+        clicksTrend,
         clicksByDay: clicksByDay.map((d) => ({
           date: d.date,
           count: Number(d.count),

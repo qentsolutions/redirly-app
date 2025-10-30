@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { TrendingUp, TrendingDown, ArrowUp, ArrowDown } from 'lucide-react'
 
 interface LinkStatsClientProps {
     linkId: string
@@ -22,6 +23,10 @@ interface LinkStatsClientProps {
 interface Stats {
     allTimeClicks: number
     recentClicks: number
+    clicksTrend?: {
+        value: number
+        isPositive: boolean
+    }
     clicksByDay: Array<{ date: string; count: number }>
     clicksByCountry: Array<{ country: string | null; count: number }>
     clicksByDevice: Array<{ device: string | null; count: number }>
@@ -245,11 +250,27 @@ export function LinkStatsClient({ linkId, linkUrl }: LinkStatsClientProps) {
                 <CardHeader>
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-4">
                                 <div>
-                                    <p className="text-sm text-gray-600 mb-1">Total Clicks</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stats?.recentClicks ?? 0}</p>
+                                    <p className="text-sm text-gray-600 mb-1">Clicks</p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-2xl font-bold text-gray-900">{stats?.recentClicks ?? 0}</p>
+                                        {stats?.clicksTrend && (
+                                            <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${stats.clicksTrend.isPositive
+                                                ? 'text-green-600 bg-green-50'
+                                                : 'text-red-600 bg-red-50'
+                                                }`}>
+                                                <span>{stats.clicksTrend.isPositive ? '+' : ''}{stats.clicksTrend.value}%</span>
+                                                {stats.clicksTrend.isPositive ? (
+                                                    <ArrowUp className="h-3 w-3" />
+                                                ) : (
+                                                    <ArrowDown className="h-3 w-3" />
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
+                                <Separator orientation='vertical' className="h-14 bg-gray-200" />
                             </div>
                             <Separator orientation='vertical' className="w-2 h-12 text-gray-800" />
                             <div className="flex flex-wrap gap-2 items-center">
