@@ -42,7 +42,7 @@ export function Navbar({ user }: NavbarProps) {
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-700">{user.name || user.email}</span>
                                 <Button variant="ghost" size="sm" onClick={handleLogout}>
-                                    Déconnexion
+                                    Logout
                                 </Button>
                             </div>
                         )}

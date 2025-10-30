@@ -61,31 +61,31 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
         setCustomDateRange({ start: startDate, end: endDate })
         if (startDate === endDate) {
             setPeriod('1')
-            // Pour une seule journée, forcer la granularité horaire
+            // For a single day, force hourly granularity
             setGranularity('hourly')
         } else {
             setPeriod('custom')
-            // Calculer les jours de différence
+            // Calculate day difference
             const daysDiff = Math.floor((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24))
-            // Si moins de 2 jours, utiliser horaire
+            // If less than 2 days, use hourly
             if (daysDiff < 2 && granularity !== 'hourly') {
                 setGranularity('hourly')
             }
-            // Si plus de 7 jours et granularité horaire, passer à daily
+            // If more than 7 days and hourly granularity, switch to daily
             if (daysDiff > 7 && granularity === 'hourly') {
                 setGranularity('daily')
             }
-            // Si moins de 14 jours et granularité weekly, passer à daily
+            // If less than 14 days and weekly granularity, switch to daily
             if (daysDiff < 14 && granularity === 'weekly') {
                 setGranularity('daily')
             }
         }
     }
 
-    // Fonction pour savoir quelles granularités sont disponibles
+    // Function to know which granularities are available
     const getAvailableGranularities = () => {
         if (!customDateRange) {
-            // Pour les périodes prédéfinies
+            // For predefined periods
             if (period === '1') return ['hourly']
             if (period === '7') return ['hourly', 'daily']
             return ['daily', 'weekly']
@@ -122,24 +122,24 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                     today.setHours(0, 0, 0, 0)
                     selectedDate.setHours(0, 0, 0, 0)
                     if (selectedDate.getTime() === today.getTime()) {
-                        return "Aujourd'hui"
+                        return "Today"
                     }
-                    return selectedDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
+                    return selectedDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })
                 }
-                return "Aujourd'hui"
+                return "Today"
             case '7':
-                return '7 derniers jours'
+                return 'Last 7 days'
             case '30':
-                return '30 derniers jours'
+                return 'Last 30 days'
             case 'custom':
                 if (customDateRange) {
-                    const start = new Date(customDateRange.start).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
-                    const end = new Date(customDateRange.end).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
+                    const start = new Date(customDateRange.start).toLocaleDateString('en-US', { day: '2-digit', month: 'short' })
+                    const end = new Date(customDateRange.end).toLocaleDateString('en-US', { day: '2-digit', month: 'short' })
                     return `${start} - ${end}`
                 }
-                return 'Période personnalisée'
+                return 'Custom period'
             default:
-                return "Aujourd'hui"
+                return "Today"
         }
     }
 
@@ -155,7 +155,7 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
         return (
             <Card>
                 <CardContent>
-                    <p className="text-center text-gray-500 py-12">Impossible de charger les statistiques</p>
+                    <p className="text-center text-gray-500 py-12">Unable to load statistics</p>
                 </CardContent>
             </Card>
         )
@@ -167,12 +167,12 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                 <CardHeader>
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
-                            <CardTitle>Clics au fil du temps</CardTitle>
+                            <CardTitle>Clicks Over Time</CardTitle>
                             <Button size="sm" variant="ghost" onClick={fetchQRCode}>
                                 <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                                 </svg>
-                                Générer QR Code
+                                Generate QR Code
                             </Button>
                         </div>
                         <div className="flex flex-wrap gap-2 items-center">
@@ -182,9 +182,9 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                                 onChange={(e) => setGranularity(e.target.value as Granularity)}
                                 className="px-3 py-2 text-sm shadow-sm border border-gray-200  rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                <option value="hourly" disabled={!availableGranularities.includes('hourly')}>Par heure</option>
-                                <option value="daily" disabled={!availableGranularities.includes('daily')}>Par jour</option>
-                                <option value="weekly" disabled={!availableGranularities.includes('weekly')}>Par semaine</option>
+                                <option value="hourly" disabled={!availableGranularities.includes('hourly')}>Hourly</option>
+                                <option value="daily" disabled={!availableGranularities.includes('daily')}>Daily</option>
+                                <option value="weekly" disabled={!availableGranularities.includes('weekly')}>Weekly</option>
                             </select>
                         </div>
                     </div>
@@ -201,13 +201,13 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                     <CardContent>
                         <div className="flex flex-col items-center">
                             <img src={qrCode} alt="QR Code" className="w-64 h-64" />
-                            <p className="text-sm text-gray-600 mt-4">Scannez ce code pour accéder au lien</p>
+                            <p className="text-sm text-gray-600 mt-4">Scan this code to access the link</p>
                             <a
                                 href={qrCode}
                                 download={`qrcode-${linkId}.png`}
                                 className="mt-4 text-primary-600 hover:text-primary-700 text-sm font-medium"
                             >
-                                Télécharger le QR Code
+                                Download QR Code
                             </a>
                         </div>
                     </CardContent>
@@ -216,48 +216,48 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Clics par pays</CardTitle>
+                        <CardTitle>Clicks by Country</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <StatsBreakdown
-                            title="Top 10 pays"
-                            data={stats.clicksByCountry.map(c => ({ label: c.country || 'Inconnu', count: c.count }))}
+                            title="Top 10 Countries"
+                            data={stats.clicksByCountry.map(c => ({ label: c.country || 'Unknown', count: c.count }))}
                             total={stats.totalClicks}
                         />
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Clics par appareil</CardTitle>
+                        <CardTitle>Clicks by Device</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <StatsBreakdown
-                            title="Types d'appareils"
-                            data={stats.clicksByDevice.map(d => ({ label: d.device || 'Inconnu', count: d.count }))}
+                            title="Device Types"
+                            data={stats.clicksByDevice.map(d => ({ label: d.device || 'Unknown', count: d.count }))}
                             total={stats.totalClicks}
                         />
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Clics par navigateur</CardTitle>
+                        <CardTitle>Clicks by Browser</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <StatsBreakdown
-                            title="Top 5 navigateurs"
-                            data={stats.clicksByBrowser.map(b => ({ label: b.browser || 'Inconnu', count: b.count }))}
+                            title="Top 5 Browsers"
+                            data={stats.clicksByBrowser.map(b => ({ label: b.browser || 'Unknown', count: b.count }))}
                             total={stats.totalClicks}
                         />
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Clics par système d'exploitation</CardTitle>
+                        <CardTitle>Clicks by Operating System</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <StatsBreakdown
                             title="Top 5 OS"
-                            data={stats.clicksByOS.map(o => ({ label: o.os || 'Inconnu', count: o.count }))}
+                            data={stats.clicksByOS.map(o => ({ label: o.os || 'Unknown', count: o.count }))}
                             total={stats.totalClicks}
                         />
                     </CardContent>

@@ -37,7 +37,7 @@ export default function SignupPage() {
                 if (data.details?.fieldErrors) {
                     setErrors(data.details.fieldErrors)
                 } else {
-                    setErrors({ general: data.error || 'Erreur lors de l\'inscription' })
+                    setErrors({ general: data.error || 'Registration error' })
                 }
                 return
             }
@@ -45,7 +45,7 @@ export default function SignupPage() {
             // Redirection vers le dashboard
             router.push('/dashboard')
         } catch (error) {
-            setErrors({ general: 'Erreur réseau. Veuillez réessayer.' })
+            setErrors({ general: 'Network error. Please try again.' })
         } finally {
             setLoading(false)
         }
@@ -58,7 +58,7 @@ export default function SignupPage() {
                     <Link href="/">
                         <h1 className="text-3xl font-bold text-primary-600">Link Tracker</h1>
                     </Link>
-                    <p className="mt-2 text-gray-600">Créez votre compte</p>
+                    <p className="mt-2 text-gray-600">Create your account</p>
                 </div>
 
                 <Card>
@@ -70,9 +70,9 @@ export default function SignupPage() {
                         )}
 
                         <Input
-                            label="Nom"
+                            label="Name"
                             type="text"
-                            placeholder="Votre nom"
+                            placeholder="Your name"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             error={errors.name?.[0]}
@@ -81,7 +81,7 @@ export default function SignupPage() {
                         <Input
                             label="Email"
                             type="email"
-                            placeholder="votre@email.com"
+                            placeholder="your@email.com"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             error={errors.email?.[0]}
@@ -89,9 +89,9 @@ export default function SignupPage() {
                         />
 
                         <Input
-                            label="Mot de passe"
+                            label="Password"
                             type="password"
-                            placeholder="Minimum 8 caractères"
+                            placeholder="Minimum 8 characters"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             error={errors.password?.[0]}
@@ -99,15 +99,15 @@ export default function SignupPage() {
                         />
 
                         <Button type="submit" className="w-full" loading={loading}>
-                            S'inscrire
+                            Sign Up
                         </Button>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">
-                            Vous avez déjà un compte ?{' '}
+                            Already have an account?{' '}
                             <Link href="/login" className="text-primary-600 hover:text-primary-700 font-medium">
-                                Se connecter
+                                Sign In
                             </Link>
                         </p>
                     </div>

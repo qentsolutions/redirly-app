@@ -4,25 +4,25 @@ import { deleteSession } from "@/lib/auth";
 
 /**
  * POST /api/auth/logout
- * Déconnecte l'utilisateur et supprime la session
+ * Logs out the user and deletes the session
  */
 export async function POST(request: NextRequest) {
   try {
     const token = await getSessionToken();
 
     if (token) {
-      // Supprime la session de la base de données
+      // Delete session from database
       await deleteSession(token);
     }
 
-    // Supprime le cookie
+    // Delete cookie
     await deleteSessionCookie();
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Logout error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la déconnexion" },
+      { error: "Error during logout" },
       { status: 500 }
     );
   }

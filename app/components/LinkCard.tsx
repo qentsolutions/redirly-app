@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from './ui/Card'
 
 /**
- * Carte d'affichage d'un lien avec toutes ses actions
+ * Link display card with all its actions
  */
 
 interface LinkCardProps {
@@ -74,7 +74,7 @@ export function LinkCard({ link }: LinkCardProps) {
         <Card>
             <CardContent className="p-6">
                 <div className="flex items-start justify-between">
-                    {/* Informations principales */}
+                    {/* Main information */}
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                             <h3 className="text-lg font-semibold text-gray-900">{link.name}</h3>
@@ -84,11 +84,11 @@ export function LinkCard({ link }: LinkCardProps) {
                                     : 'bg-gray-100 text-gray-800'
                                     }`}
                             >
-                                {link.isActive ? 'Actif' : 'Inactif'}
+                                {link.isActive ? 'Active' : 'Inactive'}
                             </span>
                         </div>
 
-                        {/* Lien court */}
+                        {/* Short link */}
                         <div className="flex items-center gap-2 mb-2">
                             <a
                                 href={shortUrl}
@@ -109,7 +109,7 @@ export function LinkCard({ link }: LinkCardProps) {
                             <CopyButton text={shortUrl} size="sm" />
                         </div>
 
-                        {/* URL originale */}
+                        {/* Original URL */}
                         <p className="text-sm text-gray-600 mb-3 flex items-center gap-2">
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path
@@ -122,7 +122,7 @@ export function LinkCard({ link }: LinkCardProps) {
                             <span className="truncate max-w-md">{link.originalUrl}</span>
                         </p>
 
-                        {/* Statistiques */}
+                        {/* Statistics */}
                         <div className="flex items-center gap-4 text-sm text-gray-600">
                             <span className="flex items-center gap-1">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -139,10 +139,10 @@ export function LinkCard({ link }: LinkCardProps) {
                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                                     />
                                 </svg>
-                                <strong>{formatNumber(link._count.clicks)}</strong> clics
+                                <strong>{formatNumber(link._count.clicks)}</strong> clicks
                             </span>
                             <span>•</span>
-                            <span>Créé le {formatDate(link.createdAt)}</span>
+                            <span>Created on {formatDate(link.createdAt)}</span>
                         </div>
                     </div>
 
@@ -150,7 +150,7 @@ export function LinkCard({ link }: LinkCardProps) {
                     <div className="flex flex-col gap-2 ml-4">
                         <Link href={`/link/${link.id}`}>
                             <Button variant="secondary" size="sm" className="w-full">
-                                📊 Statistiques
+                                Statistics
                             </Button>
                         </Link>
 
@@ -161,7 +161,7 @@ export function LinkCard({ link }: LinkCardProps) {
                             loading={loadingQR}
                             className="w-full"
                         >
-                            🔲 QR Code
+                            QR Code
                         </Button>
 
                         <EditLinkModal link={link} />
@@ -177,10 +177,10 @@ export function LinkCard({ link }: LinkCardProps) {
                             <img src={qrCode} alt="QR Code" className="mx-auto w-48 h-48" />
                             <div className="flex items-center justify-center gap-2 mt-3">
                                 <Button size="sm" onClick={handleDownloadQR}>
-                                    Télécharger
+                                    Download
                                 </Button>
                                 <Button variant="ghost" size="sm" onClick={() => setShowQR(false)}>
-                                    Fermer
+                                    Close
                                 </Button>
                             </div>
                         </div>

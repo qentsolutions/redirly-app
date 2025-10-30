@@ -27,7 +27,7 @@ export default async function OrganizationPage({ params }: PageProps) {
         redirect('/login')
     }
 
-    // Récupère l'organisation avec vérification des permissions
+    // Fetch organization with permission check
     const organization = await db.organization.findUnique({
         where: { slug },
         include: {
@@ -43,7 +43,7 @@ export default async function OrganizationPage({ params }: PageProps) {
         redirect('/dashboard')
     }
 
-    // Récupère les liens de l'organisation
+    // Fetch organization links
     const links = await db.link.findMany({
         where: {
             organizationId: organization.id,
@@ -60,7 +60,7 @@ export default async function OrganizationPage({ params }: PageProps) {
         },
     })
 
-    // Statistiques
+    // Statistics
     const totalClicks = links.reduce((sum, link) => sum + link._count.clicks, 0)
     const activeLinks = links.filter(link => link.isActive).length
 
@@ -69,12 +69,12 @@ export default async function OrganizationPage({ params }: PageProps) {
             <Navbar user={user} />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* En-tête */}
+                {/* Header */}
                 <div className="mb-8">
                     <Button variant="ghost" size="sm" asChild className="mb-4 -ml-2">
                         <Link href="/dashboard">
                             <ArrowLeft className="h-4 w-4" />
-                            Retour au dashboard
+                            Back to Dashboard
                         </Link>
                     </Button>
 
@@ -98,35 +98,35 @@ export default async function OrganizationPage({ params }: PageProps) {
 
                 <Separator className="mb-8" />
 
-                {/* Statistiques */}
+                {/* Statistics */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <StatsCard
-                        title="Total de liens"
+                        title="Total Links"
                         value={links.length}
                         icon={<Link2 className="h-5 w-5 text-muted-foreground" />}
                     />
                     <StatsCard
-                        title="Liens actifs"
+                        title="Active Links"
                         value={activeLinks}
                         icon={<CheckCircle2 className="h-5 w-5 text-green-600" />}
                     />
                     <StatsCard
-                        title="Total de clics"
+                        title="Total Clicks"
                         value={totalClicks.toLocaleString()}
                         icon={<Eye className="h-5 w-5 text-blue-600" />}
                     />
                 </div>
 
-                {/* Liste des liens */}
+                {/* Links List */}
                 {links.length === 0 ? (
                     <Card className="border-dashed">
                         <CardContent className="flex flex-col items-center justify-center py-16">
                             <div className="rounded-full bg-muted p-4 mb-4">
                                 <Link2 className="h-8 w-8 text-muted-foreground" />
                             </div>
-                            <CardTitle className="mb-2">Aucun lien créé</CardTitle>
+                            <CardTitle className="mb-2">No Links Created</CardTitle>
                             <CardDescription className="text-center mb-6 max-w-sm">
-                                Commencez par créer votre premier lien court pour suivre vos statistiques et gérer vos redirections.
+                                Start by creating your first short link to track your statistics and manage your redirects.
                             </CardDescription>
                             <CreateLinkButton organizationSlug={slug} />
                         </CardContent>
@@ -135,9 +135,9 @@ export default async function OrganizationPage({ params }: PageProps) {
                     <div className="space-y-1">
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <h2 className="text-2xl font-semibold tracking-tight">Liens</h2>
+                                <h2 className="text-2xl font-semibold tracking-tight">Links</h2>
                                 <p className="text-muted-foreground">
-                                    Gérez vos liens courts et suivez leurs performances
+                                    Manage your short links and track their performance
                                 </p>
                             </div>
                         </div>

@@ -14,7 +14,7 @@ export default async function DashboardPage() {
         redirect('/login')
     }
 
-    // Récupère les organisations de l'utilisateur
+    // Fetch user organizations
     const organizations = await db.organization.findMany({
         where: {
             members: {
@@ -36,7 +36,7 @@ export default async function DashboardPage() {
         },
     })
 
-    // Statistiques globales
+    // Global statistics
     const totalLinks = organizations.reduce((sum: any, org: any) => sum + org._count.links, 0)
 
     return (
@@ -46,10 +46,10 @@ export default async function DashboardPage() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">
-                        Bienvenue, {user.name || 'utilisateur'} !
+                        Welcome, {user.name || 'user'}!
                     </h1>
                     <p className="text-gray-600 mt-2">
-                        Gérez vos organisations et vos liens trackés
+                        Manage your organizations and tracked links
                     </p>
                 </div>
 
@@ -59,7 +59,7 @@ export default async function DashboardPage() {
                         <CardContent>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600">Organisations</p>
+                                    <p className="text-sm text-gray-600">Organizations</p>
                                     <p className="text-3xl font-bold text-gray-900 mt-1">{organizations.length}</p>
                                 </div>
                                 <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -75,7 +75,7 @@ export default async function DashboardPage() {
                         <CardContent>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600">Liens créés</p>
+                                    <p className="text-sm text-gray-600">Links Created</p>
                                     <p className="text-3xl font-bold text-gray-900 mt-1">{totalLinks}</p>
                                 </div>
                                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
                         <CardContent>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-600">Membres</p>
+                                    <p className="text-sm text-gray-600">Members</p>
                                     <p className="text-3xl font-bold text-gray-900 mt-1">
                                         {organizations.reduce((sum: any, org: any) => sum + org._count.members, 0)}
                                     </p>
@@ -110,13 +110,13 @@ export default async function DashboardPage() {
                 <Card>
                     <CardHeader>
                         <div className="flex items-center justify-between">
-                            <CardTitle>Mes organisations</CardTitle>
+                            <CardTitle>My Organizations</CardTitle>
                             <Link href="/organization/new">
                                 <Button size="sm">
                                     <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
-                                    Nouvelle organisation
+                                    New Organization
                                 </Button>
                             </Link>
                         </div>
@@ -124,9 +124,9 @@ export default async function DashboardPage() {
                     <CardContent>
                         {organizations.length === 0 ? (
                             <div className="text-center py-12">
-                                <p className="text-gray-500 mb-4">Vous n'avez pas encore d'organisation</p>
+                                <p className="text-gray-500 mb-4">You don&apos;t have any organizations yet</p>
                                 <Link href="/organization/new">
-                                    <Button>Créer votre première organisation</Button>
+                                    <Button>Create Your First Organization</Button>
                                 </Link>
                             </div>
                         ) : (
@@ -142,8 +142,8 @@ export default async function DashboardPage() {
                                             <p className="text-sm text-gray-600 mb-4">{org.description}</p>
                                         )}
                                         <div className="flex items-center gap-4 text-sm text-gray-500">
-                                            <span>{org._count.links} liens</span>
-                                            <span>{org._count.members} membres</span>
+                                            <span>{org._count.links} links</span>
+                                            <span>{org._count.members} members</span>
                                         </div>
                                     </Link>
                                 ))}

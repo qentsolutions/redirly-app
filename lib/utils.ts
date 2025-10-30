@@ -1,12 +1,12 @@
 /**
- * Fonctions utilitaires générales
+ * General utility functions
  */
 
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 /**
- * Copie du texte dans le presse-papiers
+ * Copy text to clipboard
  */
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {
@@ -19,11 +19,11 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 /**
- * Formate une date en format lisible
+ * Format date in readable format
  */
 export function formatDate(
   date: Date | string,
-  locale: string = "fr-FR"
+  locale: string = "en-US"
 ): string {
   const dateObj = typeof date === "string" ? new Date(date) : date;
   return dateObj.toLocaleDateString(locale, {
@@ -34,11 +34,11 @@ export function formatDate(
 }
 
 /**
- * Formate une date avec l'heure
+ * Format date with time
  */
 export function formatDateTime(
   date: Date | string,
-  locale: string = "fr-FR"
+  locale: string = "en-US"
 ): string {
   const dateObj = typeof date === "string" ? new Date(date) : date;
   return dateObj.toLocaleString(locale, {
@@ -51,60 +51,60 @@ export function formatDateTime(
 }
 
 /**
- * Formate une date de manière relative (il y a X jours)
+ * Format date in relative time (X days ago)
  */
 export function formatRelativeTime(
   date: Date | string,
-  locale: string = "fr"
+  locale: string = "en"
 ): string {
   const dateObj = typeof date === "string" ? new Date(date) : date;
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
-    return "À l'instant";
+    return "Just now";
   }
 
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) {
-    return `Il y a ${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""}`;
+    return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) {
-    return `Il y a ${diffInHours} heure${diffInHours > 1 ? "s" : ""}`;
+    return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays < 30) {
-    return `Il y a ${diffInDays} jour${diffInDays > 1 ? "s" : ""}`;
+    return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
   }
 
   const diffInMonths = Math.floor(diffInDays / 30);
   if (diffInMonths < 12) {
-    return `Il y a ${diffInMonths} mois`;
+    return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
   }
 
   const diffInYears = Math.floor(diffInMonths / 12);
-  return `Il y a ${diffInYears} an${diffInYears > 1 ? "s" : ""}`;
+  return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`;
 }
 
 /**
- * Formate un nombre avec séparateurs de milliers
+ * Format number with thousand separators
  */
-export function formatNumber(num: number, locale: string = "fr-FR"): string {
+export function formatNumber(num: number, locale: string = "en-US"): string {
   return num.toLocaleString(locale);
 }
 
 /**
- * Formate un nombre en pourcentage
+ * Format number as percentage
  */
 export function formatPercent(num: number, decimals: number = 1): string {
   return `${num.toFixed(decimals)}%`;
 }
 
 /**
- * Tronque un texte avec ellipsis
+ * Truncate text with ellipsis
  */
 export function truncate(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
@@ -112,7 +112,7 @@ export function truncate(text: string, maxLength: number): string {
 }
 
 /**
- * Vérifie si une chaîne est une URL valide
+ * Check if a string is a valid URL
  */
 export function isValidUrl(url: string): boolean {
   try {
@@ -124,14 +124,14 @@ export function isValidUrl(url: string): boolean {
 }
 
 /**
- * Génère un ID unique simple
+ * Generate a simple unique ID
  */
 export function generateId(): string {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }
 
 /**
- * Debounce une fonction
+ * Debounce a function
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
@@ -153,7 +153,7 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 /**
- * Throttle une fonction
+ * Throttle a function
  */
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
@@ -173,34 +173,34 @@ export function throttle<T extends (...args: any[]) => any>(
 }
 
 /**
- * Nettoie un slug (retire caractères spéciaux, convertit en minuscules, etc.)
+ * Clean a slug (remove special characters, convert to lowercase, etc.)
  */
 export function slugify(text: string): string {
   return text
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, "") // Retire caractères spéciaux
-    .replace(/[\s_-]+/g, "-") // Remplace espaces et underscores par tirets
-    .replace(/^-+|-+$/g, ""); // Retire tirets en début/fin
+    .replace(/[^\w\s-]/g, "") // Remove special characters
+    .replace(/[\s_-]+/g, "-") // Replace spaces and underscores with dashes
+    .replace(/^-+|-+$/g, ""); // Remove leading/trailing dashes
 }
 
 /**
- * Classe conditionnelle (utile pour Tailwind)
- * Utilise clsx pour gérer les conditions et tailwind-merge pour fusionner intelligemment les classes Tailwind
+ * Conditional className (useful for Tailwind)
+ * Uses clsx to handle conditions and tailwind-merge to intelligently merge Tailwind classes
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 /**
- * Attend X millisecondes (pour tests ou animations)
+ * Wait X milliseconds (for tests or animations)
  */
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
- * Récupère les initiales d'un nom
+ * Get initials from a name
  */
 export function getInitials(name: string): string {
   const parts = name.trim().split(" ");
@@ -211,7 +211,7 @@ export function getInitials(name: string): string {
 }
 
 /**
- * Génère une couleur aléatoire pour un avatar
+ * Generate a random color for an avatar
  */
 export function getAvatarColor(name: string): string {
   const colors = [

@@ -39,7 +39,7 @@ function LoginForm() {
                 if (data.details?.fieldErrors) {
                     setErrors(data.details.fieldErrors)
                 } else {
-                    setErrors({ general: data.error || 'Erreur lors de la connexion' })
+                    setErrors({ general: data.error || 'Login error' })
                 }
                 return
             }
@@ -47,7 +47,7 @@ function LoginForm() {
             // Redirection
             router.push(redirect)
         } catch (error) {
-            setErrors({ general: 'Erreur réseau. Veuillez réessayer.' })
+            setErrors({ general: 'Network error. Please try again.' })
         } finally {
             setLoading(false)
         }
@@ -60,7 +60,7 @@ function LoginForm() {
                     <Link href="/">
                         <h1 className="text-3xl font-bold text-primary-600">Link Tracker</h1>
                     </Link>
-                    <p className="mt-2 text-gray-600">Connectez-vous à votre compte</p>
+                    <p className="mt-2 text-gray-600">Sign in to your account</p>
                 </div>
 
                 <Card>
@@ -74,7 +74,7 @@ function LoginForm() {
                         <Input
                             label="Email"
                             type="email"
-                            placeholder="votre@email.com"
+                            placeholder="your@email.com"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             error={errors.email?.[0]}
@@ -82,9 +82,9 @@ function LoginForm() {
                         />
 
                         <Input
-                            label="Mot de passe"
+                            label="Password"
                             type="password"
-                            placeholder="Votre mot de passe"
+                            placeholder="Your password"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             error={errors.password?.[0]}
@@ -92,15 +92,15 @@ function LoginForm() {
                         />
 
                         <Button type="submit" className="w-full" loading={loading}>
-                            Se connecter
+                            Sign In
                         </Button>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">
-                            Pas encore de compte ?{' '}
+                            Don&apos;t have an account?{' '}
                             <Link href="/signup" className="text-primary-600 hover:text-primary-700 font-medium">
-                                S'inscrire
+                                Sign Up
                             </Link>
                         </p>
                     </div>

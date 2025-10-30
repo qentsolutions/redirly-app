@@ -12,18 +12,18 @@ interface ClicksChartProps {
 }
 
 export function ClicksChart({ data: rawData, period = '30', granularity = 'daily' }: ClicksChartProps) {
-    // Convertir les dates en objets Date
+    // Convert dates to Date objects
     const data = rawData.map((d) => ({ ...d, date: new Date(d.date), value: d.count }))
 
     if (!data || data.length === 0) {
         return (
             <div className="h-72 w-full flex items-center justify-center text-gray-500">
-                Aucune donnée disponible
+                No data available
             </div>
         )
     }
 
-    // Créer les échelles
+    // Create scales
     const xScale = scaleTime()
         .domain([data[0].date, data[data.length - 1].date])
         .range([0, 100])
@@ -33,7 +33,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
         .domain([0, maxValue])
         .range([100, 0])
 
-    // Créer la ligne avec courbe
+    // Create line with curve
     const d3Line = line<(typeof data)[number]>()
         .x((d) => xScale(d.date))
         .y((d) => yScale(d.value))
@@ -45,19 +45,19 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
         return null
     }
 
-    // Fonction pour formater les dates
+    // Function to format dates
     const formatDate = (date: Date) => {
         if (granularity === 'hourly') {
-            return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
         } else if (granularity === 'weekly') {
-            // Pour la vue hebdomadaire, afficher la semaine (ex: "Sem 42")
+            // For weekly view, display the week (ex: "Week 42")
             const weekNumber = getWeekNumber(date)
-            return `Sem ${weekNumber}`
+            return `Week ${weekNumber}`
         }
-        return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
+        return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })
     }
 
-    // Fonction pour obtenir le numéro de semaine
+    // Function to get week number
     const getWeekNumber = (date: Date): number => {
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
         const dayNum = d.getUTCDay() || 7
@@ -196,13 +196,13 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                             <TooltipContent>
                                 <div className="font-medium">
                                     {granularity === 'hourly'
-                                        ? point.date.toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+                                        ? point.date.toLocaleString('en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
                                         : granularity === 'weekly'
-                                        ? `Semaine ${getWeekNumber(point.date)} - ${point.date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}`
+                                        ? `Week ${getWeekNumber(point.date)} - ${point.date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}`
                                         : formatDate(point.date)
                                     }
                                 </div>
-                                <div className="text-gray-500 text-sm">{point.value} clics</div>
+                                <div className="text-gray-500 text-sm">{point.value} clicks</div>
                             </TooltipContent>
                         </ClientTooltip>
                     ))}
@@ -214,11 +214,11 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                         let shouldShow = false
 
                         if (granularity === 'hourly') {
-                            // Pour la vue horaire, afficher toutes les 3 heures (0h, 3h, 6h, 9h, 12h, 15h, 18h, 21h)
+                            // For hourly view, display every 3 hours (0h, 3h, 6h, 9h, 12h, 15h, 18h, 21h)
                             const hour = day.date.getHours()
                             shouldShow = hour % 3 === 0
                         } else {
-                            // Pour les autres vues, garder le comportement actuel
+                            // For other views, keep current behavior
                             const isFirst = i === 0
                             const isLast = i === data.length - 1
                             const isMax = day.value === Math.max(...data.map((d) => d.value))

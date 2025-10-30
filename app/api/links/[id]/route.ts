@@ -6,7 +6,7 @@ import QRCode from "qrcode";
 
 /**
  * GET /api/links/[id]/qrcode
- * Génère un QR code pour le lien court
+ * Generates a QR code for the short link
  */
 export async function GET(
   request: NextRequest,
@@ -16,12 +16,12 @@ export async function GET(
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const { id } = await params;
 
-    // Vérifie les permissions
+    // Check permissions
     const link = await db.link.findUnique({
       where: { id },
       include: {
@@ -39,15 +39,15 @@ export async function GET(
 
     if (!link || link.organization.members.length === 0) {
       return NextResponse.json(
-        { error: "Lien non trouvé ou accès refusé" },
+        { error: "Link not found or access denied" },
         { status: 404 }
       );
     }
 
-    // Construit l'URL courte
+    // Build short URL
     const shortUrl = buildShortUrl(link.shortCode, link.customDomain);
 
-    // Génère le QR code en data URL
+    // Generate QR code as data URL
     const qrCodeDataUrl = await QRCode.toDataURL(shortUrl, {
       errorCorrectionLevel: "M",
       margin: 1,
@@ -61,7 +61,7 @@ export async function GET(
   } catch (error) {
     console.error("Generate QR code error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la génération du QR code" },
+      { error: "Error generating QR code" },
       { status: 500 }
     );
   }

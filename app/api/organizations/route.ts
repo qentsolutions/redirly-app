@@ -6,15 +6,15 @@ import { createOrganizationSchema } from '@/lib/validation'
 
 /**
  * POST /api/organizations
- * Crée une nouvelle organisation
+ * Creates a new organization
  */
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser()
-    
+
     if (!user) {
       return NextResponse.json(
-        { error: 'Non authentifié' },
+        { error: 'Not authenticated' },
         { status: 401 }
       )
     }
@@ -24,17 +24,17 @@ export async function POST(request: NextRequest) {
     
     if (!result.success) {
       return NextResponse.json(
-        { error: 'Données invalides', details: result.error.flatten() },
+        { error: 'Invalid data', details: result.error.flatten() },
         { status: 400 }
       )
     }
 
     const { name, description } = result.data
 
-    // Génère un slug unique
+    // Generate unique slug
     const slug = await createUniqueSlug(name)
 
-    // Crée l'organisation
+    // Create organization
     const organization = await db.organization.create({
       data: {
         name,
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Create organization error:', error)
     return NextResponse.json(
-      { error: 'Erreur lors de la création de l\'organisation' },
+      { error: 'Error creating organization' },
       { status: 500 }
     )
   }
@@ -62,20 +62,20 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/organizations
- * Liste les organisations de l'utilisateur
+ * Lists the user's organizations
  */
 export async function GET() {
   try {
     const user = await getCurrentUser()
-    
+
     if (!user) {
       return NextResponse.json(
-        { error: 'Non authentifié' },
+        { error: 'Not authenticated' },
         { status: 401 }
       )
     }
 
-    // Récupère toutes les organisations où l'utilisateur est membre
+    // Get all organizations where user is a member
     const organizations = await db.organization.findMany({
       where: {
         members: {
@@ -108,7 +108,7 @@ export async function GET() {
   } catch (error) {
     console.error('Get organizations error:', error)
     return NextResponse.json(
-      { error: 'Erreur lors de la récupération des organisations' },
+      { error: 'Error retrieving organizations' },
       { status: 500 }
     )
   }

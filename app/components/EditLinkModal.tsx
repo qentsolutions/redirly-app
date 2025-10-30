@@ -8,7 +8,7 @@ import { Input } from './ui/Input'
 
 
 /**
- * Modal pour éditer un lien existant
+ * Modal to edit an existing link
  */
 
 interface EditLinkModalProps {
@@ -51,7 +51,7 @@ export function EditLinkModal({ link }: EditLinkModalProps) {
                 if (data.details?.fieldErrors) {
                     setErrors(data.details.fieldErrors)
                 } else {
-                    setErrors({ general: data.error || 'Erreur lors de la modification du lien' })
+                    setErrors({ general: data.error || 'Error updating link' })
                 }
                 return
             }
@@ -59,7 +59,7 @@ export function EditLinkModal({ link }: EditLinkModalProps) {
             setIsOpen(false)
             router.refresh()
         } catch (error) {
-            setErrors({ general: 'Erreur réseau. Veuillez réessayer.' })
+            setErrors({ general: 'Network error. Please try again.' })
         } finally {
             setLoading(false)
         }
@@ -76,10 +76,10 @@ export function EditLinkModal({ link }: EditLinkModalProps) {
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                     />
                 </svg>
-                Modifier
+                Edit
             </Button>
 
-            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Modifier le lien">
+            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Edit Link">
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {errors.general && (
                         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
@@ -88,8 +88,8 @@ export function EditLinkModal({ link }: EditLinkModalProps) {
                     )}
 
                     <Input
-                        label="Nom du lien"
-                        placeholder="Ex: Page produit 2025"
+                        label="Link Name"
+                        placeholder="Ex: Product Page 2025"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         error={errors.name?.[0]}
@@ -97,9 +97,9 @@ export function EditLinkModal({ link }: EditLinkModalProps) {
                     />
 
                     <Input
-                        label="URL de destination"
+                        label="Destination URL"
                         type="url"
-                        placeholder="https://example.com/ma-page"
+                        placeholder="https://example.com/my-page"
                         value={formData.originalUrl}
                         onChange={(e) => setFormData({ ...formData, originalUrl: e.target.value })}
                         error={errors.originalUrl?.[0]}
@@ -115,16 +115,16 @@ export function EditLinkModal({ link }: EditLinkModalProps) {
                             className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                         />
                         <label htmlFor="isActive" className="ml-2 text-sm text-gray-700">
-                            Lien actif (accepte les redirections)
+                            Active link (accepts redirections)
                         </label>
                     </div>
 
                     <div className="flex items-center justify-end gap-3 pt-4">
                         <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
-                            Annuler
+                            Cancel
                         </Button>
                         <Button type="submit" loading={loading}>
-                            Enregistrer
+                            Save
                         </Button>
                     </div>
                 </form>

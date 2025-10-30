@@ -1,51 +1,51 @@
 import { z } from "zod";
 
 /**
- * Schémas de validation avec Zod pour les formulaires et API
+ * Validation schemas with Zod for forms and API
  */
 
-// Schéma d'inscription
+// Signup schema
 export const signupSchema = z.object({
-  email: z.string().email("Email invalide"),
+  email: z.string().email("Invalid email"),
   password: z
     .string()
-    .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+    .min(8, "Password must contain at least 8 characters"),
   name: z
     .string()
-    .min(2, "Le nom doit contenir au moins 2 caractères")
+    .min(2, "Name must contain at least 2 characters")
     .optional(),
 });
 
-// Schéma de connexion
+// Login schema
 export const loginSchema = z.object({
-  email: z.string().email("Email invalide"),
-  password: z.string().min(1, "Mot de passe requis"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(1, "Password required"),
 });
 
-// Schéma de création d'organisation
+// Organization creation schema
 export const createOrganizationSchema = z.object({
   name: z
     .string()
-    .min(2, "Le nom doit contenir au moins 2 caractères")
+    .min(2, "Name must contain at least 2 characters")
     .max(100),
   description: z.string().max(500).optional(),
 });
 
-// Schéma de création de lien
+// Link creation schema
 export const createLinkSchema = z.object({
-  name: z.string().min(1, "Le nom est requis").max(200),
-  originalUrl: z.string().url("URL invalide"),
-  customDomain: z.string().url("Domaine invalide").optional(),
+  name: z.string().min(1, "Name is required").max(200),
+  originalUrl: z.string().url("Invalid URL"),
+  customDomain: z.string().url("Invalid domain").optional(),
 });
 
-// Schéma de mise à jour de lien
+// Link update schema
 export const updateLinkSchema = z.object({
-  name: z.string().min(1, "Le nom est requis").max(200).optional(),
-  originalUrl: z.string().url("URL invalide").optional(),
+  name: z.string().min(1, "Name is required").max(200).optional(),
+  originalUrl: z.string().url("Invalid URL").optional(),
   isActive: z.boolean().optional(),
 });
 
-// Types TypeScript extraits des schémas
+// TypeScript types extracted from schemas
 export type SignupInput = z.infer<typeof signupSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type CreateOrganizationInput = z.infer<typeof createOrganizationSchema>;

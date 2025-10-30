@@ -39,7 +39,7 @@ export default function NewOrganizationPage() {
                 if (data.details?.fieldErrors) {
                     setErrors(data.details.fieldErrors)
                 } else {
-                    setErrors({ general: data.error || 'Erreur lors de la création de l\'organisation' })
+                    setErrors({ general: data.error || 'Error creating organization' })
                 }
                 return
             }
@@ -47,7 +47,7 @@ export default function NewOrganizationPage() {
             // Redirection vers la nouvelle organisation
             router.push(`/organization/${data.organization.slug}`)
         } catch (error) {
-            setErrors({ general: 'Erreur réseau. Veuillez réessayer.' })
+            setErrors({ general: 'Network error. Please try again.' })
         } finally {
             setLoading(false)
         }
@@ -60,7 +60,7 @@ export default function NewOrganizationPage() {
                     <Button variant="ghost" size="sm" asChild className="mb-4 -ml-2">
                         <Link href="/dashboard">
                             <ArrowLeft className="h-4 w-4" />
-                            Retour au dashboard
+                            Back to Dashboard
                         </Link>
                     </Button>
 
@@ -68,10 +68,10 @@ export default function NewOrganizationPage() {
                         <div className="rounded-lg bg-primary/10 p-2">
                             <Building2 className="h-6 w-6" />
                         </div>
-                        <h1 className="text-3xl font-bold tracking-tight">Créer une nouvelle organisation</h1>
+                        <h1 className="text-3xl font-bold tracking-tight">Create a New Organization</h1>
                     </div>
                     <p className="text-muted-foreground text-lg">
-                        Une organisation vous permet de regrouper et gérer vos liens trackés
+                        An organization allows you to group and manage your tracked links
                     </p>
                 </div>
 
@@ -79,9 +79,9 @@ export default function NewOrganizationPage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Informations de l'organisation</CardTitle>
+                        <CardTitle>Organization Information</CardTitle>
                         <CardDescription>
-                            Renseignez les détails de votre nouvelle organisation
+                            Enter the details of your new organization
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -93,22 +93,22 @@ export default function NewOrganizationPage() {
                             )}
 
                             <Input
-                                label="Nom de l'organisation"
-                                placeholder="Ex: Mon Entreprise"
+                                label="Organization Name"
+                                placeholder="Ex: My Company"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 error={errors.name?.[0]}
-                                helperText="Le nom sera utilisé pour générer un slug unique"
+                                helperText="The name will be used to generate a unique slug"
                                 required
                             />
 
                             <div>
                                 <label className="block text-sm font-medium mb-2">
-                                    Description (optionnel)
+                                    Description (optional)
                                 </label>
                                 <textarea
                                     className="w-full px-3 py-2 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
-                                    placeholder="Décrivez brièvement votre organisation..."
+                                    placeholder="Briefly describe your organization..."
                                     rows={4}
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -123,11 +123,11 @@ export default function NewOrganizationPage() {
                             <div className="flex items-center justify-end gap-3">
                                 <Button type="button" variant="outline" asChild>
                                     <Link href="/dashboard">
-                                        Annuler
+                                        Cancel
                                     </Link>
                                 </Button>
                                 <Button type="submit" loading={loading}>
-                                    Créer l'organisation
+                                    Create Organization
                                 </Button>
                             </div>
                         </form>

@@ -6,7 +6,7 @@ import { createLinkSchema } from "@/lib/validation";
 
 /**
  * POST /api/organizations/[slug]/links
- * Crée un nouveau lien dans une organisation
+ * Creates a new link in an organization
  */
 export async function POST(
   request: NextRequest,
@@ -16,30 +16,30 @@ export async function POST(
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const { slug } = await params;
     const body = await request.json();
 
-    // Validation des données
+    // Data validation
     const result = createLinkSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
-        { error: "Données invalides", details: result.error.flatten() },
+        { error: "Invalid data", details: result.error.flatten() },
         { status: 400 }
       );
     }
 
     const { name, originalUrl, customDomain } = result.data;
 
-    // Vérifie que l'URL est valide
+    // Check that URL is valid
     if (!isValidUrl(originalUrl)) {
-      return NextResponse.json({ error: "URL invalide" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
     }
 
-    // Vérifie que l'organisation existe et que l'utilisateur en est membre
+    // Check that organization exists and user is a member
     const organization = await db.organization.findUnique({
       where: { slug },
       include: {
@@ -53,15 +53,15 @@ export async function POST(
 
     if (!organization || organization.members.length === 0) {
       return NextResponse.json(
-        { error: "Organisation non trouvée ou accès refusé" },
+        { error: "Organization not found or access denied" },
         { status: 404 }
       );
     }
 
-    // Génère un code court unique
+    // Generate unique short code
     const shortCode = await createUniqueShortCode();
 
-    // Crée le lien
+    // Create link
     const link = await db.link.create({
       data: {
         name,
@@ -76,7 +76,7 @@ export async function POST(
   } catch (error) {
     console.error("Create link error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la création du lien" },
+      { error: "Error creating link" },
       { status: 500 }
     );
   }
@@ -84,7 +84,7 @@ export async function POST(
 
 /**
  * GET /api/organizations/[slug]/links
- * Liste les liens d'une organisation
+ * Lists the links of an organization
  */
 export async function GET(
   request: NextRequest,
@@ -94,12 +94,12 @@ export async function GET(
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const { slug } = await params;
 
-    // Vérifie que l'organisation existe et que l'utilisateur en est membre
+    // Check that organization exists and user is a member
     const organization = await db.organization.findUnique({
       where: { slug },
       include: {
@@ -113,12 +113,12 @@ export async function GET(
 
     if (!organization || organization.members.length === 0) {
       return NextResponse.json(
-        { error: "Organisation non trouvée ou accès refusé" },
+        { error: "Organization not found or access denied" },
         { status: 404 }
       );
     }
 
-    // Récupère les liens avec statistiques
+    // Retrieve links with statistics
     const links = await db.link.findMany({
       where: {
         organizationId: organization.id,
@@ -139,7 +139,7 @@ export async function GET(
   } catch (error) {
     console.error("Get links error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la récupération des liens" },
+      { error: "Error retrieving links" },
       { status: 500 }
     );
   }

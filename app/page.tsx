@@ -13,10 +13,10 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-4">
               <Link href="/login">
-                <Button variant="ghost">Connexion</Button>
+                <Button variant="ghost">Sign In</Button>
               </Link>
               <Link href="/signup">
-                <Button>Inscription</Button>
+                <Button>Sign Up</Button>
               </Link>
             </div>
           </div>
@@ -29,19 +29,19 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-6">
-              Créez et suivez vos liens courts
+              Create and track your short links
               <br />
-              <span className="text-primary-600">avec des statistiques détaillées</span>
+              <span className="text-primary-600">with detailed analytics</span>
             </h2>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Link Tracker vous permet de créer des liens courts personnalisés et d'analyser leur performance avec des statistiques en temps réel.
+              Link Tracker allows you to create custom short links and analyze their performance with real-time statistics.
             </p>
             <div className="flex items-center justify-center gap-4">
               <Link href="/signup">
-                <Button size="lg">Commencer gratuitement</Button>
+                <Button size="lg">Get Started for Free</Button>
               </Link>
               <Link href="/login">
-                <Button size="lg" variant="ghost">En savoir plus</Button>
+                <Button size="lg" variant="ghost">Learn More</Button>
               </Link>
             </div>
           </div>
@@ -54,9 +54,9 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Liens courts rapides</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Fast Short Links</h3>
               <p className="text-gray-600">
-                Créez des liens courts mémorisables en quelques secondes avec notre générateur automatique.
+                Create memorable short links in seconds with our automatic generator.
               </p>
             </div>
 
@@ -66,9 +66,9 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Analytics détaillées</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Detailed Analytics</h3>
               <p className="text-gray-600">
-                Suivez les clics, la géolocalisation, les devices et bien plus encore avec nos tableaux de bord.
+                Track clicks, geolocation, devices and much more with our dashboards.
               </p>
             </div>
 
@@ -78,9 +78,9 @@ export default function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Sécurité et confidentialité</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Security and Privacy</h3>
               <p className="text-gray-600">
-                Vos données sont protégées. Nous anonymisons les IP et respectons le RGPD.
+                Your data is protected. We anonymize IPs and comply with GDPR.
               </p>
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function HomePage() {
       <footer className="bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-gray-500 text-sm">
-            © 2025 Link Tracker. Tous droits réservés.
+            © 2025 Link Tracker. All rights reserved.
           </p>
         </div>
       </footer>

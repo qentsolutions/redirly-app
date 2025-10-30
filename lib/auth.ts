@@ -3,14 +3,14 @@ import { nanoid } from "nanoid";
 import { db } from "./prisma";
 
 /**
- * Système d'authentification simplifié inspiré de BetterAuth
- * Gère l'inscription, connexion, sessions et tokens
+ * Simplified authentication system inspired by BetterAuth
+ * Manages registration, login, sessions and tokens
  */
 
 // Configuration
-const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 jours en millisecondes
+const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
-// Interface pour l'utilisateur authentifié
+// Interface for authenticated user
 export interface AuthUser {
   id: string;
   email: string;
@@ -18,14 +18,14 @@ export interface AuthUser {
 }
 
 /**
- * Hache un mot de passe avec bcrypt
+ * Hash a password with bcrypt
  */
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
 
 /**
- * Vérifie un mot de passe
+ * Verify a password
  */
 export async function verifyPassword(
   password: string,
@@ -35,7 +35,7 @@ export async function verifyPassword(
 }
 
 /**
- * Crée un nouvel utilisateur
+ * Create a new user
  */
 export async function createUser(
   email: string,
@@ -56,7 +56,7 @@ export async function createUser(
 }
 
 /**
- * Trouve un utilisateur par email
+ * Find a user by email
  */
 export async function findUserByEmail(email: string) {
   return db.user.findUnique({
@@ -65,7 +65,7 @@ export async function findUserByEmail(email: string) {
 }
 
 /**
- * Crée une nouvelle session pour un utilisateur
+ * Create a new session for a user
  */
 export async function createSession(userId: string) {
   const token = nanoid(32);
@@ -92,7 +92,7 @@ export async function createSession(userId: string) {
 }
 
 /**
- * Valide une session par token
+ * Validate a session by token
  */
 export async function validateSession(token: string) {
   const session = await db.session.findUnique({
@@ -112,7 +112,7 @@ export async function validateSession(token: string) {
     return null;
   }
 
-  // Vérifie si la session n'est pas expirée
+  // Check if the session is not expired
   if (session.expiresAt < new Date()) {
     await db.session.delete({ where: { id: session.id } });
     return null;
@@ -122,7 +122,7 @@ export async function validateSession(token: string) {
 }
 
 /**
- * Supprime une session (logout)
+ * Delete a session (logout)
  */
 export async function deleteSession(token: string) {
   await db.session.delete({
@@ -131,7 +131,7 @@ export async function deleteSession(token: string) {
 }
 
 /**
- * Supprime toutes les sessions expirées
+ * Delete all expired sessions
  */
 export async function cleanupExpiredSessions() {
   await db.session.deleteMany({
@@ -144,7 +144,7 @@ export async function cleanupExpiredSessions() {
 }
 
 /**
- * Authentifie un utilisateur avec email et mot de passe
+ * Authenticate a user with email and password
  */
 export async function authenticateUser(email: string, password: string) {
   const user = await findUserByEmail(email);

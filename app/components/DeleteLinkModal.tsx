@@ -7,7 +7,7 @@ import { Modal } from './ui/Modal'
 
 
 /**
- * Modal de confirmation pour supprimer un lien
+ * Confirmation modal to delete a link
  */
 
 interface DeleteLinkModalProps {
@@ -34,14 +34,14 @@ export function DeleteLinkModal({ link }: DeleteLinkModalProps) {
 
             if (!response.ok) {
                 const data = await response.json()
-                setError(data.error || 'Erreur lors de la suppression du lien')
+                setError(data.error || 'Error deleting link')
                 return
             }
 
             setIsOpen(false)
             router.refresh()
         } catch (error) {
-            setError('Erreur réseau. Veuillez réessayer.')
+            setError('Network error. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -58,10 +58,10 @@ export function DeleteLinkModal({ link }: DeleteLinkModalProps) {
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                 </svg>
-                <span className="text-red-600">Supprimer</span>
+                <span className="text-red-600">Delete</span>
             </Button>
 
-            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Supprimer le lien">
+            <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Delete Link">
                 <div className="space-y-4">
                     {error && (
                         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
@@ -83,13 +83,13 @@ export function DeleteLinkModal({ link }: DeleteLinkModalProps) {
                                 />
                             </svg>
                             <div className="ml-3">
-                                <h3 className="text-sm font-medium text-yellow-800">Attention</h3>
+                                <h3 className="text-sm font-medium text-yellow-800">Warning</h3>
                                 <p className="text-sm text-yellow-700 mt-1">
-                                    Vous êtes sur le point de supprimer le lien <strong>{link.name}</strong>.
+                                    You are about to delete the link <strong>{link.name}</strong>.
                                 </p>
                                 <p className="text-sm text-yellow-700 mt-2">
-                                    Cette action est <strong>irréversible</strong> et supprimera également toutes les
-                                    statistiques associées à ce lien.
+                                    This action is <strong>irreversible</strong> and will also delete all
+                                    statistics associated with this link.
                                 </p>
                             </div>
                         </div>
@@ -97,10 +97,10 @@ export function DeleteLinkModal({ link }: DeleteLinkModalProps) {
 
                     <div className="flex items-center justify-end gap-3 pt-4">
                         <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>
-                            Annuler
+                            Cancel
                         </Button>
                         <Button variant="destructive" onClick={handleDelete} loading={loading}>
-                            Supprimer définitivement
+                            Delete Permanently
                         </Button>
                     </div>
                 </div>

@@ -6,38 +6,38 @@ import { loginSchema } from "@/lib/validation";
 
 /**
  * POST /api/auth/login
- * Authentifie un utilisateur et crée une session
+ * Authenticates a user and creates a session
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Validation des données
+    // Data validation
     const result = loginSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
-        { error: "Données invalides", details: result.error.flatten() },
+        { error: "Invalid data", details: result.error.flatten() },
         { status: 400 }
       );
     }
 
     const { email, password } = result.data;
 
-    // Authentifie l'utilisateur
+    // Authenticate user
     const user = await authenticateUser(email, password);
 
     if (!user) {
       return NextResponse.json(
-        { error: "Email ou mot de passe incorrect" },
+        { error: "Incorrect email or password" },
         { status: 401 }
       );
     }
 
-    // Crée une session
+    // Create session
     const session = await createSession(user.id);
 
-    // Définit le cookie de session
+    // Set session cookie
     await setSessionCookie(session.token);
 
     return NextResponse.json({
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la connexion" },
+      { error: "Error during login" },
       { status: 500 }
     );
   }

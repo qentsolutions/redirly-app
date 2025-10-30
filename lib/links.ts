@@ -2,8 +2,8 @@ import { nanoid, customAlphabet } from "nanoid";
 import { db } from "./prisma";
 
 /**
- * Génère un code court unique pour les liens
- * Utilise un alphabet sans caractères ambigus
+ * Generate unique short code for links
+ * Uses an alphabet without ambiguous characters
  */
 const generateShortCode = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -11,7 +11,7 @@ const generateShortCode = customAlphabet(
 );
 
 /**
- * Crée un code court unique (vérifie l'unicité en DB)
+ * Create unique short code (checks uniqueness in DB)
  */
 export async function createUniqueShortCode(): Promise<string> {
   let attempts = 0;
@@ -20,7 +20,7 @@ export async function createUniqueShortCode(): Promise<string> {
   while (attempts < maxAttempts) {
     const shortCode = generateShortCode();
 
-    // Vérifie si le code existe déjà
+    // Check if the code already exists
     const existing = await db.link.findUnique({
       where: { shortCode },
     });
@@ -36,7 +36,7 @@ export async function createUniqueShortCode(): Promise<string> {
 }
 
 /**
- * Valide une URL
+ * Validate a URL
  */
 export function isValidUrl(url: string): boolean {
   try {
@@ -48,16 +48,16 @@ export function isValidUrl(url: string): boolean {
 }
 
 /**
- * Génère un slug unique pour une organisation
+ * Generate unique slug for an organization
  */
 export async function createUniqueSlug(baseName: string): Promise<string> {
-  // Nettoie le nom pour créer un slug
+  // Clean the name to create a slug
   let slug = baseName
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-  // Vérifie l'unicité
+  // Check uniqueness
   let counter = 0;
   let uniqueSlug = slug;
 
@@ -76,7 +76,7 @@ export async function createUniqueSlug(baseName: string): Promise<string> {
 }
 
 /**
- * Construit l'URL complète du lien court
+ * Build the complete URL of the short link
  */
 export function buildShortUrl(
   shortCode: string,

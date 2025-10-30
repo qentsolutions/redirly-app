@@ -8,8 +8,8 @@ import { Modal } from './ui/Modal'
 
 
 /**
- * Bouton proéminent et modal pour créer un nouveau lien
- * Version améliorée avec plus d'options
+ * Prominent button and modal to create a new link
+ * Enhanced version with more options
  */
 
 interface CreateLinkButtonProps {
@@ -66,17 +66,17 @@ export function CreateLinkButton({
                 if (data.details?.fieldErrors) {
                     setErrors(data.details.fieldErrors)
                 } else {
-                    setErrors({ general: data.error || 'Erreur lors de la création du lien' })
+                    setErrors({ general: data.error || 'Error creating link' })
                 }
                 return
             }
 
-            // Succès
+            // Success
             setCreatedLink(data.link)
             setSuccess(true)
             setFormData({ name: '', originalUrl: '', customDomain: '' })
 
-            // Rafraîchir après 2 secondes
+            // Refresh after 2 seconds
             setTimeout(() => {
                 router.refresh()
                 setIsOpen(false)
@@ -84,7 +84,7 @@ export function CreateLinkButton({
                 setCreatedLink(null)
             }, 2000)
         } catch (error) {
-            setErrors({ general: 'Erreur réseau. Veuillez réessayer.' })
+            setErrors({ general: 'Network error. Please try again.' })
         } finally {
             setLoading(false)
         }
@@ -116,10 +116,10 @@ export function CreateLinkButton({
                         d="M12 4v16m8-8H4"
                     />
                 </svg>
-                Créer un lien
+                Create Link
             </Button>
 
-            <Modal isOpen={isOpen} onClose={handleClose} title="Créer un nouveau lien">
+            <Modal isOpen={isOpen} onClose={handleClose} title="Create New Link">
                 {success && createdLink ? (
                     <div className="space-y-4">
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -136,9 +136,9 @@ export function CreateLinkButton({
                                     />
                                 </svg>
                                 <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-green-800">Lien créé avec succès !</h3>
+                                    <h3 className="text-sm font-medium text-green-800">Link created successfully!</h3>
                                     <p className="text-sm text-green-700 mt-1">
-                                        Votre lien court est prêt à être utilisé
+                                        Your short link is ready to use
                                     </p>
                                     <div className="mt-3 p-3 bg-white rounded border border-green-200">
                                         <code className="text-sm font-mono text-green-900">
@@ -150,7 +150,7 @@ export function CreateLinkButton({
                             </div>
                         </div>
                         <p className="text-sm text-gray-600 text-center">
-                            Fermeture automatique dans quelques instants...
+                            Closing automatically in a few moments...
                         </p>
                     </div>
                 ) : (
@@ -162,24 +162,24 @@ export function CreateLinkButton({
                         )}
 
                         <Input
-                            label="Nom du lien"
-                            placeholder="Ex: Page produit 2025"
+                            label="Link Name"
+                            placeholder="Ex: Product Page 2025"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             error={errors.name?.[0]}
-                            helperText="Un nom descriptif pour identifier facilement ce lien"
+                            helperText="A descriptive name to easily identify this link"
                             required
                             autoFocus
                         />
 
                         <Input
-                            label="URL de destination"
+                            label="Destination URL"
                             type="url"
-                            placeholder="https://example.com/ma-page"
+                            placeholder="https://example.com/my-page"
                             value={formData.originalUrl}
                             onChange={(e) => setFormData({ ...formData, originalUrl: e.target.value })}
                             error={errors.originalUrl?.[0]}
-                            helperText="L'URL complète vers laquelle le lien court redirigera"
+                            helperText="The full URL to which the short link will redirect"
                             required
                         />
 
@@ -199,18 +199,18 @@ export function CreateLinkButton({
                                             d="M9 5l7 7-7 7"
                                         />
                                     </svg>
-                                    Options avancées (optionnel)
+                                    Advanced options (optional)
                                 </span>
                             </summary>
                             <div className="mt-4 pl-5">
                                 <Input
-                                    label="Domaine personnalisé"
+                                    label="Custom Domain"
                                     type="url"
-                                    placeholder="https://votredomaine.com"
+                                    placeholder="https://yourdomain.com"
                                     value={formData.customDomain}
                                     onChange={(e) => setFormData({ ...formData, customDomain: e.target.value })}
                                     error={errors.customDomain?.[0]}
-                                    helperText="Si vous avez configuré un domaine personnalisé"
+                                    helperText="If you have configured a custom domain"
                                 />
                             </div>
                         </details>
@@ -225,18 +225,18 @@ export function CreateLinkButton({
                                     />
                                 </svg>
                                 <span>
-                                    Un code court unique sera généré automatiquement. Les clics seront trackés de
-                                    manière anonyme (RGPD compliant).
+                                    A unique short code will be generated automatically. Clicks will be tracked
+                                    anonymously (GDPR compliant).
                                 </span>
                             </div>
                         </div>
 
                         <div className="flex items-center justify-end gap-3 pt-4">
                             <Button type="button" variant="ghost" onClick={handleClose} disabled={loading}>
-                                Annuler
+                                Cancel
                             </Button>
                             <Button type="submit" loading={loading}>
-                                {loading ? 'Création...' : 'Créer le lien'}
+                                {loading ? 'Creating...' : 'Create Link'}
                             </Button>
                         </div>
                     </form>

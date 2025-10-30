@@ -7,44 +7,44 @@ import { db } from "@/lib/prisma";
 
 /**
  * POST /api/auth/signup
- * Crée un nouvel utilisateur et sa première organisation
+ * Creates a new user and their first organization
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Validation des données
+    // Data validation
     const result = signupSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
-        { error: "Données invalides", details: result.error.flatten() },
+        { error: "Invalid data", details: result.error.flatten() },
         { status: 400 }
       );
     }
 
     const { email, password, name } = result.data;
 
-    // Vérifie si l'utilisateur existe déjà
+    // Check if user already exists
     const existingUser = await findUserByEmail(email);
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "Un compte avec cet email existe déjà" },
+        { error: "An account with this email already exists" },
         { status: 409 }
       );
     }
 
-    // Crée l'utilisateur
+    // Create user
     const user = await createUser(email, password, name);
 
-    // Crée une organisation par défaut pour l'utilisateur
+    // Create a default organization for the user
     const orgName = name || email.split("@")[0];
     const slug = await createUniqueSlug(orgName);
 
     await db.organization.create({
       data: {
-        name: `Organisation de ${orgName}`,
+        name: `Organization of ${orgName}`,
         slug,
         ownerId: user.id,
         members: {
@@ -56,10 +56,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Crée une session
+    // Create session
     const session = await createSession(user.id);
 
-    // Définit le cookie de session
+    // Set session cookie
     await setSessionCookie(session.token);
 
     return NextResponse.json({
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la création du compte" },
+      { error: "Error creating account" },
       { status: 500 }
     );
   }
