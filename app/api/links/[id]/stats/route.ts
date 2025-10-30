@@ -26,6 +26,10 @@ export async function GET(
     const granularity = searchParams.get("granularity") || "daily";
     const customStartDate = searchParams.get("startDate");
     const customEndDate = searchParams.get("endDate");
+    const filterDevice = searchParams.get("device");
+    const filterBrowser = searchParams.get("browser");
+    const filterOS = searchParams.get("os");
+    const filterCountry = searchParams.get("country");
 
     // Vérifie les permissions
     const link = await db.link.findUnique({
@@ -49,6 +53,15 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    // Build base filter conditions
+    const baseFilterConditions: Prisma.ClickWhereInput = {
+      linkId: id,
+      ...(filterDevice && { device: filterDevice }),
+      ...(filterBrowser && { browser: filterBrowser }),
+      ...(filterOS && { os: filterOS }),
+      ...(filterCountry && { country: filterCountry }),
+    };
 
     // Calcule la date de début selon la période
     let startDate = new Date();
@@ -89,13 +102,15 @@ export async function GET(
     }
 
     // Statistiques globales
-    const totalClicks = await db.click.count({
-      where: { linkId: id },
+    // allTimeClicks: tous les clics filtrés (sans date range)
+    const allTimeClicks = await db.click.count({
+      where: baseFilterConditions,
     });
 
+    // recentClicks: clics filtrés dans la période sélectionnée (avec date range)
     const recentClicks = await db.click.count({
       where: {
-        linkId: id,
+        ...baseFilterConditions,
         timestamp: {
           gte: startDate,
           ...(customStartDate && customEndDate ? { lte: endDate } : {}),
@@ -116,6 +131,10 @@ export async function GET(
         WHERE "linkId" = ${id}
           AND timestamp >= ${startDate}
           ${customStartDate && customEndDate ? Prisma.sql`AND timestamp <= ${endDate}` : Prisma.empty}
+          ${filterDevice ? Prisma.sql`AND device = ${filterDevice}` : Prisma.empty}
+          ${filterBrowser ? Prisma.sql`AND browser = ${filterBrowser}` : Prisma.empty}
+          ${filterOS ? Prisma.sql`AND os = ${filterOS}` : Prisma.empty}
+          ${filterCountry ? Prisma.sql`AND country = ${filterCountry}` : Prisma.empty}
         GROUP BY DATE_TRUNC('hour', timestamp)
         ORDER BY DATE_TRUNC('hour', timestamp) ASC
       `;
@@ -150,6 +169,10 @@ export async function GET(
         WHERE "linkId" = ${id}
           AND timestamp >= ${startDate}
           ${customStartDate && customEndDate ? Prisma.sql`AND timestamp <= ${endDate}` : Prisma.empty}
+          ${filterDevice ? Prisma.sql`AND device = ${filterDevice}` : Prisma.empty}
+          ${filterBrowser ? Prisma.sql`AND browser = ${filterBrowser}` : Prisma.empty}
+          ${filterOS ? Prisma.sql`AND os = ${filterOS}` : Prisma.empty}
+          ${filterCountry ? Prisma.sql`AND country = ${filterCountry}` : Prisma.empty}
         GROUP BY DATE_TRUNC('week', timestamp)
         ORDER BY DATE_TRUNC('week', timestamp) ASC
       `;
@@ -163,6 +186,10 @@ export async function GET(
         WHERE "linkId" = ${id}
           AND timestamp >= ${startDate}
           ${customStartDate && customEndDate ? Prisma.sql`AND timestamp <= ${endDate}` : Prisma.empty}
+          ${filterDevice ? Prisma.sql`AND device = ${filterDevice}` : Prisma.empty}
+          ${filterBrowser ? Prisma.sql`AND browser = ${filterBrowser}` : Prisma.empty}
+          ${filterOS ? Prisma.sql`AND os = ${filterOS}` : Prisma.empty}
+          ${filterCountry ? Prisma.sql`AND country = ${filterCountry}` : Prisma.empty}
         GROUP BY DATE_TRUNC('day', timestamp)
         ORDER BY DATE_TRUNC('day', timestamp) ASC
       `;
@@ -186,7 +213,7 @@ export async function GET(
       }
     }
 
-    // Clics par pays
+    // Clics par pays (ne pas filtrer par country ici)
     const clicksByCountry = await db.click.groupBy({
       by: ["country"],
       where: {
@@ -194,6 +221,13 @@ export async function GET(
         country: {
           not: null,
         },
+        timestamp: {
+          gte: startDate,
+          ...(customStartDate && customEndDate ? { lte: endDate } : {}),
+        },
+        ...(filterDevice && { device: filterDevice }),
+        ...(filterBrowser && { browser: filterBrowser }),
+        ...(filterOS && { os: filterOS }),
       },
       _count: {
         country: true,
@@ -206,7 +240,7 @@ export async function GET(
       take: 10,
     });
 
-    // Clics par device
+    // Clics par device (ne pas filtrer par device ici)
     const clicksByDevice = await db.click.groupBy({
       by: ["device"],
       where: {
@@ -214,13 +248,20 @@ export async function GET(
         device: {
           not: null,
         },
+        timestamp: {
+          gte: startDate,
+          ...(customStartDate && customEndDate ? { lte: endDate } : {}),
+        },
+        ...(filterBrowser && { browser: filterBrowser }),
+        ...(filterOS && { os: filterOS }),
+        ...(filterCountry && { country: filterCountry }),
       },
       _count: {
         device: true,
       },
     });
 
-    // Clics par navigateur
+    // Clics par navigateur (ne pas filtrer par browser ici)
     const clicksByBrowser = await db.click.groupBy({
       by: ["browser"],
       where: {
@@ -228,6 +269,13 @@ export async function GET(
         browser: {
           not: null,
         },
+        timestamp: {
+          gte: startDate,
+          ...(customStartDate && customEndDate ? { lte: endDate } : {}),
+        },
+        ...(filterDevice && { device: filterDevice }),
+        ...(filterOS && { os: filterOS }),
+        ...(filterCountry && { country: filterCountry }),
       },
       _count: {
         browser: true,
@@ -240,7 +288,7 @@ export async function GET(
       take: 5,
     });
 
-    // Clics par OS
+    // Clics par OS (ne pas filtrer par os ici)
     const clicksByOS = await db.click.groupBy({
       by: ["os"],
       where: {
@@ -248,6 +296,13 @@ export async function GET(
         os: {
           not: null,
         },
+        timestamp: {
+          gte: startDate,
+          ...(customStartDate && customEndDate ? { lte: endDate } : {}),
+        },
+        ...(filterDevice && { device: filterDevice }),
+        ...(filterBrowser && { browser: filterBrowser }),
+        ...(filterCountry && { country: filterCountry }),
       },
       _count: {
         os: true,
@@ -262,7 +317,7 @@ export async function GET(
 
     return NextResponse.json({
       stats: {
-        totalClicks,
+        allTimeClicks,
         recentClicks,
         clicksByDay: clicksByDay.map((d) => ({
           date: d.date,

@@ -75,31 +75,8 @@ export default async function LinkStatsPage({ params }: PageProps) {
                     </div>
                 </div>
 
-                {/* Link Info */}
-                <Card className="mb-8">
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-sm text-gray-600 mb-1">Destination URL</p>
-                                <a
-                                    href={link.originalUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-primary-600 hover:text-primary-700 break-all"
-                                >
-                                    {link.originalUrl}
-                                </a>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600 mb-1">Total Clicks</p>
-                                <p className="text-2xl font-bold text-gray-900">{link._count.clicks}</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
                 {/* Statistics (client component) */}
-                <LinkStatsClient linkId={id} />
+                <LinkStatsClient linkId={id} linkUrl={link.originalUrl} />
             </main>
         </div>
     )

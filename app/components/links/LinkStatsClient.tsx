@@ -12,13 +12,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 
 interface LinkStatsClientProps {
     linkId: string
+    linkUrl: string
 }
 
 interface Stats {
-    totalClicks: number
+    allTimeClicks: number
     recentClicks: number
     clicksByDay: Array<{ date: string; count: number }>
     clicksByCountry: Array<{ country: string | null; count: number }>
@@ -30,7 +32,14 @@ interface Stats {
 type Period = '1' | '7' | '30' | 'custom'
 type Granularity = 'hourly' | 'daily' | 'weekly'
 
-export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
+interface ActiveFilters {
+    device?: string
+    browser?: string
+    os?: string
+    country?: string
+}
+
+export function LinkStatsClient({ linkId, linkUrl }: LinkStatsClientProps) {
     const [stats, setStats] = useState<Stats | null>(null)
     const [qrCode, setQrCode] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
@@ -38,10 +47,11 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
     const [period, setPeriod] = useState<Period>('1')
     const [customDateRange, setCustomDateRange] = useState<{ start: string; end: string } | null>(null)
     const [granularity, setGranularity] = useState<Granularity>('hourly')
+    const [activeFilters, setActiveFilters] = useState<ActiveFilters>({})
 
     useEffect(() => {
         fetchStats()
-    }, [linkId, period, customDateRange, granularity])
+    }, [linkId, period, customDateRange, granularity, activeFilters])
 
     const fetchStats = async () => {
         setLoading(true)
@@ -54,6 +64,13 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                     url = `/api/links/${linkId}/stats?period=custom&startDate=${customDateRange.start}&endDate=${customDateRange.end}&granularity=${granularity}`
                 }
             }
+
+            // Add filters to URL
+            if (activeFilters.device) url += `&device=${encodeURIComponent(activeFilters.device)}`
+            if (activeFilters.browser) url += `&browser=${encodeURIComponent(activeFilters.browser)}`
+            if (activeFilters.os) url += `&os=${encodeURIComponent(activeFilters.os)}`
+            if (activeFilters.country) url += `&country=${encodeURIComponent(activeFilters.country)}`
+
             const response = await fetch(url)
             const data = await response.json()
             setStats(data.stats)
@@ -62,6 +79,37 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleFilterClick = (label: string, type: string) => {
+        setActiveFilters(prev => {
+            const newFilters = { ...prev }
+
+            switch (type) {
+                case 'Devices':
+                    newFilters.device = label
+                    break
+                case 'Browser':
+                    newFilters.browser = label
+                    break
+                case 'OS':
+                    newFilters.os = label
+                    break
+                case 'Country':
+                    newFilters.country = label
+                    break
+            }
+
+            return newFilters
+        })
+    }
+
+    const removeFilter = (filterType: keyof ActiveFilters) => {
+        setActiveFilters(prev => {
+            const newFilters = { ...prev }
+            delete newFilters[filterType]
+            return newFilters
+        })
     }
 
     const handleDateRangeChange = (startDate: string, endDate: string) => {
@@ -170,12 +218,58 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
 
     return (
         <div className="space-y-6">
+            {/* Link Info */}
+            <Card>
+                <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-sm text-gray-600 mb-1">Destination URL</p>
+                            <a
+                                href={linkUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary-600 hover:text-primary-700 break-all"
+                            >
+                                {linkUrl}
+                            </a>
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-600 mb-1">All Time Clicks</p>
+                            <p className="text-2xl font-bold text-gray-900">{stats?.allTimeClicks ?? 0}</p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
             <Card>
                 <CardHeader>
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
-                            <CardTitle>Clicks Over Time</CardTitle>
+                            <div className="flex items-center gap-6">
+                                <div>
+                                    <p className="text-sm text-gray-600 mb-1">Total Clicks</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stats?.recentClicks ?? 0}</p>
+                                </div>
+                            </div>
+                            <Separator orientation='vertical' className="w-2 h-12 text-gray-800" />
                             <div className="flex flex-wrap gap-2 items-center">
+                                {Object.entries(activeFilters).map(([key, value]) => (
+                                    <div
+                                        key={key}
+                                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm"
+                                    >
+                                        <span className="font-medium capitalize">{key}:</span>
+                                        <span>{value}</span>
+                                        <button
+                                            onClick={() => removeFilter(key as keyof ActiveFilters)}
+                                            className="ml-1 hover:bg-blue-200 rounded-full p-0.5"
+                                        >
+                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ))}
                                 <DateRangePicker onDateRangeChange={handleDateRangeChange} periodLabel={getPeriodLabel()} />
                                 <Select value={granularity} onValueChange={(value) => setGranularity(value as Granularity)}>
                                     <SelectTrigger className="w-[130px]">
@@ -237,7 +331,9 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                         <StatsBreakdown
                             title="Top 10 Countries"
                             data={stats.clicksByCountry.map(c => ({ label: c.country || 'Unknown', count: c.count }))}
-                            total={stats.totalClicks}
+                            total={stats.recentClicks}
+                            type="Country"
+                            onItemClick={handleFilterClick}
                         />
                     </CardContent>
                 </Card>
@@ -249,7 +345,9 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                         <StatsBreakdown
                             title="Device Types"
                             data={stats.clicksByDevice.map(d => ({ label: d.device || 'Unknown', count: d.count }))}
-                            total={stats.totalClicks}
+                            total={stats.recentClicks}
+                            type='Devices'
+                            onItemClick={handleFilterClick}
                         />
                     </CardContent>
                 </Card>
@@ -261,7 +359,9 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                         <StatsBreakdown
                             title="Top 5 Browsers"
                             data={stats.clicksByBrowser.map(b => ({ label: b.browser || 'Unknown', count: b.count }))}
-                            total={stats.totalClicks}
+                            total={stats.recentClicks}
+                            type='Browser'
+                            onItemClick={handleFilterClick}
                         />
                     </CardContent>
                 </Card>
@@ -273,7 +373,9 @@ export function LinkStatsClient({ linkId }: LinkStatsClientProps) {
                         <StatsBreakdown
                             title="Top 5 OS"
                             data={stats.clicksByOS.map(o => ({ label: o.os || 'Unknown', count: o.count }))}
-                            total={stats.totalClicks}
+                            total={stats.recentClicks}
+                            type="OS"
+                            onItemClick={handleFilterClick}
                         />
                     </CardContent>
                 </Card>
