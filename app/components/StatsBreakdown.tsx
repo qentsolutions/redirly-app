@@ -215,7 +215,7 @@ export function StatsBreakdown({ title, data, total, type, onItemClick }: StatsB
                     })}
                     {/* Grid lines */}
                     <svg className="h-full w-full" viewBox={`0 0 100 ${containerHeight}`} preserveAspectRatio="none">
-                        {xScale.ticks(8).map((value, i) => (
+                        {xScale.ticks(2).map((value, i) => (
                             <g
                                 key={i}
                                 transform={`translate(${xScale(value)},0)`}

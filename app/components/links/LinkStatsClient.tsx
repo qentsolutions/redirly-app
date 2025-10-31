@@ -205,8 +205,65 @@ export function LinkStatsClient({ linkId, linkUrl }: LinkStatsClientProps) {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <div className="space-y-6 animate-pulse">
+                {/* Link Info Skeleton */}
+                <Card>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                                <div className="h-5 bg-gray-200 rounded w-3/4"></div>
+                            </div>
+                            <div>
+                                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                                <div className="h-8 bg-gray-200 rounded w-20"></div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Chart Skeleton */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div>
+                                    <div className="h-4 bg-gray-200 rounded w-12 mb-2"></div>
+                                    <div className="h-10 bg-gray-200 rounded w-24"></div>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <div className="h-10 bg-gray-200 rounded w-32"></div>
+                                <div className="h-10 bg-gray-200 rounded w-32"></div>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="h-64 bg-gray-100 rounded"></div>
+                    </CardContent>
+                </Card>
+
+                {/* Stats Breakdown Skeletons */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {[1, 2, 3, 4].map((i) => (
+                        <Card key={i}>
+                            <CardHeader>
+                                <div className="h-6 bg-gray-200 rounded w-40"></div>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-3">
+                                    <div className="h-4 bg-gray-200 rounded w-32 mb-4"></div>
+                                    {[1, 2, 3].map((j) => (
+                                        <div key={j} className="flex items-center gap-2">
+                                            <div className="h-10 bg-gray-200 rounded flex-1"></div>
+                                            <div className="h-4 bg-gray-200 rounded w-12"></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
             </div>
         )
     }
@@ -254,7 +311,7 @@ export function LinkStatsClient({ linkId, linkUrl }: LinkStatsClientProps) {
                                 <div>
                                     <p className="text-sm text-gray-600 mb-1">Clicks</p>
                                     <div className="flex items-center gap-2">
-                                        <p className="text-2xl font-bold text-gray-900">{stats?.recentClicks ?? 0}</p>
+                                        <p className="text-4xl font-bold text-gray-900">{stats?.recentClicks ?? 0}</p>
                                         {stats?.clicksTrend && (
                                             <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${stats.clicksTrend.isPositive
                                                 ? 'text-green-600 bg-green-50'
@@ -270,7 +327,7 @@ export function LinkStatsClient({ linkId, linkUrl }: LinkStatsClientProps) {
                                         )}
                                     </div>
                                 </div>
-                                <Separator orientation='vertical' className="h-14 bg-gray-200" />
+                                <Separator orientation='vertical' className="h-18 bg-gray-200" />
                             </div>
                             <Separator orientation='vertical' className="w-2 h-12 text-gray-800" />
                             <div className="flex flex-wrap gap-2 items-center">
