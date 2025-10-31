@@ -5,6 +5,7 @@ import {
     FaMobileAlt, FaDesktop, FaTabletAlt,  // Devices
     FaGlobeAmericas, // Country (fallback)
 } from 'react-icons/fa'
+import { ClientTooltip, TooltipContent, TooltipTrigger } from './ui/ClientTooltip'
 
 interface StatItem {
     label: string
@@ -155,66 +156,77 @@ export function StatsBreakdown({ title, data, total, type, onItemClick }: StatsB
         <div className="w-full">
             <h4 className="text-sm font-medium text-gray-900 mb-3">{title}</h4>
             <div className="relative w-full" style={{ height: containerHeight }}>
-                <div className="absolute inset-0 left-10 right-4 overflow-visible z-20">
+                <div className="absolute inset-0 left-2 right-2 overflow-visible z-20">
                     {displayData.map((entry, i) => {
                         const barWidth = xScale(entry.count)
                         const percentage = total > 0 ? (entry.count / total) * 100 : 0
                         return (
-                            <div
-                                key={i}
-                                style={{
-                                    position: "absolute",
-                                    top: `${yScale(entry.label)}px`,
-                                    height: `${barHeight}px`,
-                                    width: '100%',
-                                }}
-                            >
-                                <div
-                                    className={`relative flex items-center transition-all duration-200 ${onItemClick && entry.label !== 'Unknown' ? 'cursor-pointer' : ''} ${hoveredIndex !== null && hoveredIndex !== i ? 'opacity-30 grayscale bg-white border border-gray-200' : 'bg-white border border-gray-200'}`}
-                                    style={{
-                                        height: `${barHeight}px`,
-                                        width: `${barWidth}%`,
-                                        borderRadius: `0 4px 4px 0`,
-                                    }}
-                                    onClick={() => onItemClick && entry.label !== 'Unknown' && onItemClick(entry.label, type)}
-                                    onMouseEnter={() => setHoveredIndex(i)}
-                                    onMouseLeave={() => setHoveredIndex(null)}
-                                >
-                                    <span
-                                        className="flex items-center gap-2"
+                            <ClientTooltip key={i}>
+                                <TooltipTrigger>
+                                    <div
                                         style={{
-                                            marginLeft: type === 'Country' && entry.flag ? '0' : '10px',
-                                            fontSize: "0.75rem",
-                                            fontWeight: "700",
-                                            color: '#4b5563'
+                                            position: "absolute",
+                                            top: `${yScale(entry.label)}px`,
+                                            height: `${barHeight}px`,
+                                            width: '100%',
                                         }}
                                     >
-                                        {type === 'Country' && entry.flag && (
-                                            <img
-                                                src={`https://hatscripts.github.io/circle-flags/flags/${entry.flag}.svg`}
-                                                className="w-5 h-5 ml-2 mr-1 opacity-80"
-                                            />
-                                        )}
-                                        {type !== 'Country' && getIcon(entry.label, type)}
+                                        <div
+                                            className={`relative flex items-center transition-all duration-200 ${onItemClick && entry.label !== 'Unknown' ? 'cursor-pointer' : ''} ${hoveredIndex !== null && hoveredIndex !== i ? 'opacity-30 grayscale bg-white border border-gray-200' : 'bg-white border border-gray-200'}`}
+                                            style={{
+                                                height: `${barHeight}px`,
+                                                width: `${barWidth}%`,
+                                                borderRadius: `0 4px 4px 0`,
+                                            }}
+                                            onClick={() => onItemClick && entry.label !== 'Unknown' && onItemClick(entry.label, type)}
+                                            onMouseEnter={() => setHoveredIndex(i)}
+                                            onMouseLeave={() => setHoveredIndex(null)}
+                                        >
+                                            <span
+                                                className="flex items-center gap-2"
+                                                style={{
+                                                    marginLeft: type === 'Country' && entry.flag ? '0' : '10px',
+                                                    fontSize: "0.75rem",
+                                                    fontWeight: "700",
+                                                    color: '#4b5563'
+                                                }}
+                                            >
+                                                {type === 'Country' && entry.flag && (
+                                                    <img
+                                                        src={`https://hatscripts.github.io/circle-flags/flags/${entry.flag}.svg`}
+                                                        className="w-5 h-5 ml-2 mr-1 opacity-80"
+                                                    />
+                                                )}
+                                                {type !== 'Country' && getIcon(entry.label, type)}
+                                                {entry.label}
+                                            </span>
+                                        </div>
+                                        <span
+                                            style={{
+                                                position: 'absolute',
+                                                right: '8px',
+                                                top: '50%',
+                                                transform: 'translateY(-50%)',
+                                                fontSize: "0.75rem",
+                                                fontWeight: "500",
+                                                color: '#6b7280',
+                                                whiteSpace: 'nowrap',
+                                                pointerEvents: 'none'
+                                            }}
+                                        >
+                                            {percentage.toFixed(1)}%
+                                        </span>
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <div className="font-medium">
+                                        {entry.count} {entry.count <= 1 ? 'click' : 'clicks'}
+                                    </div>
+                                    <div className="text-gray-500 text-sm">
                                         {entry.label}
-                                    </span>
-                                </div>
-                                <span
-                                    style={{
-                                        position: 'absolute',
-                                        right: '8px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        fontSize: "0.75rem",
-                                        fontWeight: "500",
-                                        color: '#6b7280',
-                                        whiteSpace: 'nowrap',
-                                        pointerEvents: 'none'
-                                    }}
-                                >
-                                    {percentage.toFixed(1)}%
-                                </span>
-                            </div>
+                                    </div>
+                                </TooltipContent>
+                            </ClientTooltip>
                         )
                     })}
                     {/* Grid lines */}
