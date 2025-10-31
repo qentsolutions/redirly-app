@@ -7,8 +7,10 @@ import { createPortal } from "react-dom";
  * -----------------------------------------------------------------------------------------------*/
 
 type TooltipContextValue = {
-  tooltip: { x: number; y: number } | undefined;
-  setTooltip: (tooltip: { x: number; y: number } | undefined) => void;
+  tooltip: { x: number; y: number; content: React.ReactNode } | undefined;
+  setTooltip: (tooltip: { x: number; y: number; content: React.ReactNode } | undefined) => void;
+  isActive: boolean;
+  setIsActive: (active: boolean) => void;
 };
 
 const TooltipContext = React.createContext<TooltipContextValue | undefined>(undefined);
@@ -26,10 +28,13 @@ function useTooltipContext(componentName: string): TooltipContextValue {
  * -----------------------------------------------------------------------------------------------*/
 
 const Tooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [tooltip, setTooltip] = React.useState<{ x: number; y: number }>();
+  const [tooltip, setTooltip] = React.useState<{ x: number; y: number; content: React.ReactNode }>();
+  const [isActive, setIsActive] = React.useState(false);
 
   return (
-    <TooltipContext.Provider value={{ tooltip, setTooltip }}>{children}</TooltipContext.Provider>
+    <TooltipContext.Provider value={{ tooltip, setTooltip, isActive, setIsActive }}>
+      {children}
+    </TooltipContext.Provider>
   );
 };
 
@@ -39,61 +44,64 @@ const Tooltip: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const TRIGGER_NAME = "TooltipTrigger";
 
-const TooltipTrigger = React.forwardRef<SVGGElement, { children: React.ReactNode }>(
+type TooltipTriggerProps = {
+  children: React.ReactNode;
+  content: React.ReactNode;
+  as?: 'div' | 'g';
+};
+
+const TooltipTrigger = React.forwardRef<HTMLDivElement | SVGGElement, TooltipTriggerProps>(
   (props, forwardedRef) => {
-    const { children } = props;
+    const { children, content, as: Component = 'div' } = props;
     const context = useTooltipContext(TRIGGER_NAME);
-    const triggerRef = React.useRef<SVGGElement | null>(null);
+    const triggerRef = React.useRef<HTMLDivElement | SVGGElement | null>(null);
 
-    React.useEffect(() => {
-      const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-        if (triggerRef.current && !triggerRef.current.contains(event.target as Node)) {
-          context.setTooltip(undefined);
+    const handlers = {
+      onPointerMove: (event: React.PointerEvent) => {
+        if (event.pointerType === "mouse") {
+          context.setTooltip({ x: event.clientX, y: event.clientY, content });
+          context.setIsActive(true);
         }
-      };
+      },
+      onPointerLeave: (event: React.PointerEvent) => {
+        if (event.pointerType === "mouse") {
+          context.setIsActive(false);
+        }
+      },
+      onTouchStart: (event: React.TouchEvent) => {
+        context.setTooltip({
+          x: event.touches[0].clientX,
+          y: event.touches[0].clientY,
+          content
+        });
+        context.setIsActive(true);
+        setTimeout(() => {
+          context.setIsActive(false);
+        }, 2000);
+      },
+    };
 
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("touchstart", handleClickOutside);
+    const ref = (node: HTMLDivElement | SVGGElement | null) => {
+      triggerRef.current = node;
+      if (typeof forwardedRef === "function") {
+        forwardedRef(node as any);
+      } else if (forwardedRef) {
+        (forwardedRef as any).current = node;
+      }
+    };
 
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-        document.removeEventListener("touchstart", handleClickOutside);
-      };
-    }, [context]);
+    if (Component === 'g') {
+      return (
+        <g ref={ref as any} {...handlers}>
+          {children}
+        </g>
+      );
+    }
 
     return (
-      <g
-        ref={(node) => {
-          // Maintain both refs
-          triggerRef.current = node;
-          if (typeof forwardedRef === "function") {
-            forwardedRef(node);
-          } else if (forwardedRef) {
-            forwardedRef.current = node;
-          }
-        }}
-        onPointerMove={(event) => {
-          // Only handle mouse events, not touch
-          if (event.pointerType === "mouse") {
-            context.setTooltip({ x: event.clientX, y: event.clientY });
-          }
-        }}
-        onPointerLeave={(event) => {
-          // Only handle mouse events, not touch
-          if (event.pointerType === "mouse") {
-            context.setTooltip(undefined);
-          }
-        }}
-        onTouchStart={(event) => {
-          // On mobile, trigger when clicked instead of hover. Change as needed.
-          context.setTooltip({ x: event.touches[0].clientX, y: event.touches[0].clientY });
-          setTimeout(() => {
-            context.setTooltip(undefined);
-          }, 2000);
-        }}
-      >
+      <div ref={ref as any} {...handlers}>
         {children}
-      </g>
+      </div>
     );
   }
 );
@@ -106,52 +114,66 @@ TooltipTrigger.displayName = TRIGGER_NAME;
 
 const CONTENT_NAME = "TooltipContent";
 
-const TooltipContent = React.forwardRef<HTMLDivElement, { children: React.ReactNode }>((props, forwardedRef) => {
-  const { children } = props;
+const TooltipContent = React.forwardRef<HTMLDivElement, {}>((props, forwardedRef) => {
   const context = useTooltipContext(CONTENT_NAME);
   const runningOnClient = typeof document !== "undefined";
   const tooltipRef = React.useRef<HTMLDivElement>(null);
+  const [position, setPosition] = React.useState({ top: 0, left: 0 });
+  const [isVisible, setIsVisible] = React.useState(false);
 
-  // Calculate position based on viewport
-  const getTooltipPosition = () => {
-    if (!tooltipRef.current || !context.tooltip) return {};
+  // Update position smoothly when tooltip moves
+  React.useEffect(() => {
+    if (!tooltipRef.current || !context.tooltip) return;
 
     const tooltipWidth = tooltipRef.current.offsetWidth;
+    const tooltipHeight = tooltipRef.current.offsetHeight;
     const viewportWidth = window.innerWidth;
-    const willOverflowRight = context.tooltip.x + tooltipWidth + 10 > viewportWidth;
+    const viewportHeight = window.innerHeight;
 
-    return {
-      top: context.tooltip.y - 20,
-      left: willOverflowRight ? context.tooltip.x - tooltipWidth - 10 : context.tooltip.x + 10,
+    // Determine if tooltip should be on left or right
+    const willOverflowRight = context.tooltip.x + tooltipWidth + 20 > viewportWidth;
+    const willOverflowBottom = context.tooltip.y + tooltipHeight + 10 > viewportHeight;
+
+    const newPosition = {
+      top: willOverflowBottom ? context.tooltip.y - tooltipHeight - 10 : context.tooltip.y + 10,
+      left: willOverflowRight ? context.tooltip.x - tooltipWidth - 20 : context.tooltip.x + 20,
     };
-  };
 
-  if (!context.tooltip || !runningOnClient) {
+    setPosition(newPosition);
+  }, [context.tooltip]);
+
+  // Handle visibility with smooth transition
+  React.useEffect(() => {
+    if (context.isActive && context.tooltip) {
+      setIsVisible(true);
+    } else {
+      // Add a small delay before hiding to prevent flicker
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [context.isActive, context.tooltip]);
+
+  if (!context.tooltip || !runningOnClient || !isVisible) {
     return null;
   }
 
   const isMobile = window.innerWidth < 768;
 
   return createPortal(
-    isMobile ? (
-      <div
-        className="fixed h-fit z-60 w-fit rounded-lg bg-white  border border-zinc-200  p-3"
-        style={{
-          top: context.tooltip.y,
-          left: context.tooltip.x + 20,
-        }}
-      >
-        {children}
-      </div>
-    ) : (
-      <div
-        ref={tooltipRef}
-        className="bg-white  border border-zinc-200  px-3.5 py-2 rounded-sm fixed z-50"
-        style={getTooltipPosition()}
-      >
-        {children}
-      </div>
-    ),
+    <div
+      ref={tooltipRef}
+      className="bg-white border border-zinc-200 px-3.5 py-2 rounded-sm fixed z-50 pointer-events-none shadow-lg"
+      style={{
+        top: position.top,
+        left: position.left,
+        transition: 'top 0.15s ease-out, left 0.15s ease-out, opacity 0.15s ease-out',
+        opacity: context.isActive ? 1 : 0,
+      }}
+    >
+      {context.tooltip.content}
+    </div>,
     document.body
   );
 });

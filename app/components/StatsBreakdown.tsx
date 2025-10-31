@@ -155,14 +155,26 @@ export function StatsBreakdown({ title, data, total, type, onItemClick }: StatsB
     return (
         <div className="w-full">
             <h4 className="text-sm font-medium text-gray-900 mb-3">{title}</h4>
-            <div className="relative w-full" style={{ height: containerHeight }}>
-                <div className="absolute inset-0 left-2 right-2 overflow-visible z-20">
-                    {displayData.map((entry, i) => {
-                        const barWidth = xScale(entry.count)
-                        const percentage = total > 0 ? (entry.count / total) * 100 : 0
-                        return (
-                            <ClientTooltip key={i}>
-                                <TooltipTrigger>
+            <ClientTooltip>
+                <div className="relative w-full" style={{ height: containerHeight }}>
+                    <div className="absolute inset-0 left-2 right-2 overflow-visible z-20">
+                        {displayData.map((entry, i) => {
+                            const barWidth = xScale(entry.count)
+                            const percentage = total > 0 ? (entry.count / total) * 100 : 0
+                            return (
+                                <TooltipTrigger
+                                    key={i}
+                                    content={
+                                        <div>
+                                            <div className="font-medium">
+                                                {entry.count} {entry.count <= 1 ? 'click' : 'clicks'}
+                                            </div>
+                                            <div className="text-gray-500 text-sm">
+                                                {entry.label}
+                                            </div>
+                                        </div>
+                                    }
+                                >
                                     <div
                                         style={{
                                             position: "absolute",
@@ -218,51 +230,44 @@ export function StatsBreakdown({ title, data, total, type, onItemClick }: StatsB
                                         </span>
                                     </div>
                                 </TooltipTrigger>
-                                <TooltipContent>
-                                    <div className="font-medium">
-                                        {entry.count} {entry.count <= 1 ? 'click' : 'clicks'}
-                                    </div>
-                                    <div className="text-gray-500 text-sm">
-                                        {entry.label}
-                                    </div>
-                                </TooltipContent>
-                            </ClientTooltip>
-                        )
-                    })}
-                    {/* Grid lines */}
-                    <svg className="h-full w-full" viewBox={`0 0 100 ${containerHeight}`} preserveAspectRatio="none">
-                        {xScale.ticks(2).map((value, i) => (
-                            <g
+                            )
+                        })}
+                        <TooltipContent />
+                        {/* Grid lines
+                        <svg className="h-full w-full" viewBox={`0 0 100 ${containerHeight}`} preserveAspectRatio="none">
+                            {xScale.ticks(2).map((value, i) => (
+                                <g
+                                    key={i}
+                                    transform={`translate(${xScale(value)},0)`}
+                                    className="text-gray-400/80"
+                                >
+                                    <line
+                                        y1={0}
+                                        y2={containerHeight}
+                                        stroke="currentColor"
+                                        strokeDasharray="6,5"
+                                        strokeWidth={0.5}
+                                        vectorEffect="non-scaling-stroke"
+                                    />
+                                </g>
+                            ))}
+                        </svg> */}
+                        {/* X Axis (Values) */}
+                        {xScale.ticks(4).map((value, i) => (
+                            <div
                                 key={i}
-                                transform={`translate(${xScale(value)},0)`}
-                                className="text-gray-400/80"
+                                style={{
+                                    left: `${xScale(value)}%`,
+                                    top: `${containerHeight}px`,
+                                }}
+                                className="absolute text-xs -translate-x-1/2 tabular-nums text-gray-400"
                             >
-                                <line
-                                    y1={0}
-                                    y2={containerHeight}
-                                    stroke="currentColor"
-                                    strokeDasharray="6,5"
-                                    strokeWidth={0.5}
-                                    vectorEffect="non-scaling-stroke"
-                                />
-                            </g>
+                                {value}
+                            </div>
                         ))}
-                    </svg>
-                    {/* X Axis (Values) */}
-                    {xScale.ticks(4).map((value, i) => (
-                        <div
-                            key={i}
-                            style={{
-                                left: `${xScale(value)}%`,
-                                top: `${containerHeight}px`,
-                            }}
-                            className="absolute text-xs -translate-x-1/2 tabular-nums text-gray-400"
-                        >
-                            {value}
-                        </div>
-                    ))}
+                    </div>
                 </div>
-            </div>
+            </ClientTooltip>
         </div>
     )
 }
