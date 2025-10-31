@@ -198,7 +198,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                                     key={index}
                                     d={segmentData || ''}
                                     fill="none"
-                                    className={isHighlighted ? 'stroke-blue-500' : 'stroke-gray-300'}
+                                    className={isHighlighted ? 'stroke-blue-500' : 'stroke-blue-200'}
                                     strokeWidth="3"
                                     vectorEffect="non-scaling-stroke"
                                     style={{
@@ -248,7 +248,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                                             y2={100}
                                             stroke="currentColor"
                                             strokeWidth={2}
-                                            className="opacity-0 group-hover/tooltip:opacity-100 text-zinc-300 transition-opacity"
+                                            className="opacity-0 group-hover/tooltip:opacity-100 text-blue-500 transition-opacity"
                                             vectorEffect="non-scaling-stroke"
                                             style={{ pointerEvents: 'none' }}
                                         />
