@@ -6,6 +6,8 @@ import { buildShortUrl } from '@/lib/links'
 import { Navbar } from '@/app/components/layout/navbar'
 import { Card, CardContent } from '@/app/components/ui/Card'
 import { LinkStatsClient } from '@/app/components/links/LinkStatsClient'
+import { ExternalLink } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
 
 
 interface PageProps {
@@ -63,8 +65,26 @@ export default async function LinkStatsPage({ params }: PageProps) {
                         ← Back to Organization
                     </Link>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">{link.name}</h1>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <span>Short link: <code className="bg-gray-100 px-2 py-1 rounded">{shortUrl}</code></span>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                            <a
+                                href={shortUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-primary-600 transition-colors"
+                            >
+                                <code className="py-1 rounded">{shortUrl}</code>
+                            </a>
+                            <a
+                                href={shortUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gray-500 hover:text-primary-600 transition-colors"
+                            >
+                                <ExternalLink size={16} />
+                            </a>
+                        </div>
+                        <Separator orientation='vertical' className="text-gray-500 bg-gray-300 h-4" />
                         <span
                             className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-full ${link.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                                 }`}

@@ -49,9 +49,9 @@ export function LinkStatsClient({ linkId, linkUrl }: LinkStatsClientProps) {
     const [qrCode, setQrCode] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
     const [showQR, setShowQR] = useState(false)
-    const [period, setPeriod] = useState<Period>('1')
+    const [period, setPeriod] = useState<Period>('7')
     const [customDateRange, setCustomDateRange] = useState<{ start: string; end: string } | null>(null)
-    const [granularity, setGranularity] = useState<Granularity>('hourly')
+    const [granularity, setGranularity] = useState<Granularity>('daily')
     const [activeFilters, setActiveFilters] = useState<ActiveFilters>({})
 
     useEffect(() => {
