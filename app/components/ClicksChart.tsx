@@ -1,6 +1,6 @@
 'use client'
 
-import React, { CSSProperties } from 'react'
+import React, { CSSProperties, useState } from 'react'
 import { scaleTime, scaleLinear } from 'd3-scale'
 import { line, curveMonotoneX } from 'd3-shape'
 import { ClientTooltip, TooltipContent, TooltipTrigger } from './ui/ClientTooltip'
@@ -12,6 +12,8 @@ interface ClicksChartProps {
 }
 
 export function ClicksChart({ data: rawData, period = '30', granularity = 'daily' }: ClicksChartProps) {
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+
     // Convert dates to Date objects
     const data = rawData.map((d) => ({ ...d, date: new Date(d.date), value: d.count }))
 
@@ -29,6 +31,32 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
         .range([0, 100])
 
     const maxValue = Math.max(...data.map((d) => d.value), 0)
+
+    // Calculate nice tick interval based on max value
+    const getNiceTickInterval = (max: number): number => {
+        if (max === 0) return 1
+
+        // Try to get around 5-8 ticks
+        const roughInterval = max / 6
+
+        // Get the magnitude (power of 10)
+        const magnitude = Math.pow(10, Math.floor(Math.log10(roughInterval)))
+
+        // Normalize to be between 1 and 10
+        const normalized = roughInterval / magnitude
+
+        // Round to nice numbers: 1, 2, 5
+        let niceNormalized: number
+        if (normalized <= 1) niceNormalized = 1
+        else if (normalized <= 2) niceNormalized = 2
+        else if (normalized <= 5) niceNormalized = 5
+        else niceNormalized = 10
+
+        return niceNormalized * magnitude
+    }
+
+    const tickInterval = getNiceTickInterval(maxValue)
+
     const yScale = scaleLinear()
         .domain([0, maxValue])
         .range([100, 0])
@@ -101,9 +129,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                         overflow-visible
                     "
                 >
-                    {yScale
-                        .ticks(8)
-                        .filter((value) => Number.isInteger(value))
+                    {Array.from({ length: Math.floor(maxValue / tickInterval) + 1 }, (_, i) => i * tickInterval)
                         .map((value) => (
                             <div
                                 key={value}
@@ -126,6 +152,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                         translate-x-[var(--marginLeft)]
                         translate-y-[var(--marginTop)]
                         overflow-visible
+                        cursor-pointer
                     "
                 >
                     <svg
@@ -134,9 +161,7 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                         preserveAspectRatio="none"
                     >
                         {/* Grid lines */}
-                        {yScale
-                            .ticks(8)
-                            .filter((value) => Number.isInteger(value))
+                        {Array.from({ length: Math.floor(maxValue / tickInterval) + 1 }, (_, i) => i * tickInterval)
                             .map((value, i) => (
                                 <g
                                     key={i}
@@ -153,14 +178,35 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                                     />
                                 </g>
                             ))}
-                        {/* Line */}
-                        <path
-                            d={d}
-                            fill="none"
-                            className="stroke-blue-500"
-                            strokeWidth="3"
-                            vectorEffect="non-scaling-stroke"
-                        />
+                        {/* Line segments */}
+                        {data.map((point, index) => {
+                            if (index === data.length - 1) return null
+
+                            const nextPoint = data[index + 1]
+                            const segmentLine = line<(typeof data)[number]>()
+                                .x((d) => xScale(d.date))
+                                .y((d) => yScale(d.value))
+                                .curve(curveMonotoneX)
+
+                            const segmentData = segmentLine([point, nextPoint])
+
+                            // Determine if this segment should be highlighted
+                            const isHighlighted = hoveredIndex === null || hoveredIndex === index || hoveredIndex === index + 1
+
+                            return (
+                                <path
+                                    key={index}
+                                    d={segmentData || ''}
+                                    fill="none"
+                                    className={isHighlighted ? 'stroke-blue-500' : 'stroke-gray-300'}
+                                    strokeWidth="3"
+                                    vectorEffect="non-scaling-stroke"
+                                    style={{
+                                        transition: 'stroke 200ms ease-in-out',
+                                    }}
+                                />
+                            )
+                        })}
 
                         {/* Circles and Tooltips */}
                         {data.map((point, index) => {
@@ -223,6 +269,8 @@ export function ClicksChart({ data: rawData, period = '30', granularity = 'daily
                                             })()}
                                             height={100}
                                             fill="transparent"
+                                            onMouseEnter={() => setHoveredIndex(index)}
+                                            onMouseLeave={() => setHoveredIndex(null)}
                                         />
                                     </g>
                                 </TooltipTrigger>
