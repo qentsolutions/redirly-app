@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { scaleBand, scaleLinear, max } from 'd3'
 import {
     FaMobileAlt, FaDesktop, FaTabletAlt,  // Devices
@@ -21,6 +21,8 @@ interface StatsBreakdownProps {
 }
 
 export function StatsBreakdown({ title, data, total, type, onItemClick }: StatsBreakdownProps) {
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+
     if (data.length === 0) {
         return (
             <div className="text-center py-4 text-gray-500">
@@ -168,13 +170,15 @@ export function StatsBreakdown({ title, data, total, type, onItemClick }: StatsB
                                 }}
                             >
                                 <div
-                                    className={`relative bg-white border border-gray-200 flex items-center ${onItemClick && entry.label !== 'Unknown' ? 'cursor-pointer hover:bg-gray-100 transition-colors' : ''}`}
+                                    className={`relative flex items-center transition-all duration-200 ${onItemClick && entry.label !== 'Unknown' ? 'cursor-pointer' : ''} ${hoveredIndex !== null && hoveredIndex !== i ? 'opacity-30 grayscale bg-white border border-gray-200' : 'bg-white border border-gray-200'}`}
                                     style={{
                                         height: `${barHeight}px`,
                                         width: `${barWidth}%`,
                                         borderRadius: `0 4px 4px 0`,
                                     }}
                                     onClick={() => onItemClick && entry.label !== 'Unknown' && onItemClick(entry.label, type)}
+                                    onMouseEnter={() => setHoveredIndex(i)}
+                                    onMouseLeave={() => setHoveredIndex(null)}
                                 >
                                     <span
                                         className="flex items-center gap-2"
